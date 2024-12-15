@@ -22,10 +22,10 @@ class LoginController extends Controller
         ];
 
         if (auth()->attempt($authAttempt, $request->boolean('remember'))) {
-            return redirect()->intended(route('home.index'));
+            return redirect()->intended(route('home'));
         }
 
-        return redirect()->route('login.index')->withInput()->withErrors([
+        return redirect()->route('login')->withInput()->withErrors([
             'login' => 'Invalid email or password provided.',
         ]);
     }

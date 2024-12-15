@@ -1,6 +1,6 @@
 <?php
 
-namespace Auth;
+namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,7 +22,7 @@ class LoginTest extends TestCase
 
     public function testCanViewLoginPage(): void
     {
-        $response = $this->get(route('login.index'));
+        $response = $this->get(route('login'));
 
         $response->assertStatus(200);
     }
@@ -32,13 +32,13 @@ class LoginTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->post(route('login.login'), [
+        $response = $this->post(route('login.action'), [
             'email' => $user->email,
             'password' => 'password',
             'remember' => $rememberMe,
         ]);
 
-        $response->assertRedirect(route('home.index'));
+        $response->assertRedirect(route('home'));
 
         $this->assertAuthenticatedAs($user);
 
@@ -52,13 +52,13 @@ class LoginTest extends TestCase
     #[DataProvider('rememberMeDataProvider')]
     public function testErrorIsDisplayedWithInvalidCredentials(?string $rememberMe): void
     {
-        $response = $this->post(route('login.login'), [
+        $response = $this->post(route('login.action'), [
             'email' => 'notexistinguser@test.com',
             'password' => 'password',
             'remember' => $rememberMe,
         ]);
 
-        $response->assertRedirect(route('login.index'));
+        $response->assertRedirect(route('login'));
         $response->assertSessionHasErrors('login');
 
         $this->assertGuest();

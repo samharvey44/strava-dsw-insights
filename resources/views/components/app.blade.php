@@ -22,7 +22,7 @@
 @auth
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('home.index') }}">{{ config('app.name') }}</a>
+            <a class="navbar-brand" href="{{ route('home') }}">{{ config('app.name') }}</a>
             <button class="navbar-toggler"
                     type="button"
                     data-bs-toggle="collapse"
@@ -37,7 +37,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a @class(["nav-link", "active" => Route::is('home.index')]) {{ Route::is('home.index') ? 'aria-current="page"' : '' }} href="{{ route('home.index') }}">
+                        <a @class(["nav-link", "active" => Route::is('home')]) {{ Route::is('home') ? 'aria-current="page"' : '' }} href="{{ route('home') }}">
                             <i class="bi bi-house"></i>
                             Home
                         </a>
