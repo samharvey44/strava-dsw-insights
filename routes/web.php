@@ -3,7 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Home\HomeController;
-use App\Http\Controllers\Strava\StravaAuthRedirectController;
+use App\Http\Controllers\Strava\StravaAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -20,6 +20,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
     });
 
-    Route::get('/strava-auth-redirect', StravaAuthRedirectController::class)
-        ->name('strava.auth-redirect');
+    Route::prefix('/strava-auth')->name('strava-auth.')->group(function () {
+        Route::get('/redirect', [StravaAuthController::class, 'redirect'])->name('redirect');
+
+        Route::get('/successful', [StravaAuthController::class, 'successful'])->name('successful');
+        Route::get('/unsuccessful', [StravaAuthController::class, 'unsuccessful'])->name('unsuccessful');
+    });
 });

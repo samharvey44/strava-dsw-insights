@@ -9,21 +9,16 @@ use Illuminate\Http\Client\PendingRequest;
 
 class StravaHttpClient extends AbstractHttpClient
 {
-    public function __construct(private readonly User $forUser)
-    {
-        //
-    }
-
-    public function getBaseUri(): string
+    protected function getBaseUri(): string
     {
         return 'https://www.strava.com/api/v3';
     }
 
-    public function getPendingRequest(): PendingRequest
+    protected function getPendingRequest(?User $forUser): PendingRequest
     {
         $http = Http::asJson()->acceptJson();
 
-        $accessToken = $this->forUser->stravaConnection?->access_token;
+        $accessToken = $forUser?->stravaConnection?->access_token;
 
         if ($accessToken) {
             $accessToken = decrypt($accessToken);

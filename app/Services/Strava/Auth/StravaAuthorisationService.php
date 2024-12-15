@@ -5,6 +5,7 @@ namespace App\Services\Strava\Auth;
 use App\Http\Integrations\Strava\StravaHttpClient;
 use App\Models\StravaConnection;
 use App\Models\User;
+use App\Services\Strava\Activities\StravaActivitiesService;
 
 class StravaAuthorisationService
 {
@@ -15,7 +16,7 @@ class StravaAuthorisationService
         ]);
         $redirectUri = sprintf(
             '%s?%s',
-            config('strava.redirect_uri') ?? route('strava.auth-redirect'),
+            config('strava.redirect_uri') ?? route('strava-auth.redirect'),
             $redirectUriQueryString
         );
 
@@ -51,11 +52,14 @@ class StravaAuthorisationService
 
         $responseJson = $response->json();
 
-        $stravaConnection = $user->stravaConnection()->first() ?? StravaConnection::make([
+        $previousStravaConnection = $user->stravaConnection()->first();
+        $previousAthleteId = $previousStravaConnection?->athlete_id;
+
+        $newStravaConnection = $previousStravaConnection ?? StravaConnection::make([
             'user_id' => $user->id,
         ]);
 
-        $stravaConnection->fill([
+        $newStravaConnection->fill([
             'athlete_id' => $responseJson['athlete']['id'],
             'access_token' => encrypt($responseJson['access_token']),
             'refresh_token' => encrypt($responseJson['refresh_token']),
@@ -63,8 +67,15 @@ class StravaAuthorisationService
             'active' => true,
         ]);
 
-        $stravaConnection->save();
+        $newStravaConnection->save();
 
-        return $stravaConnection;
+        // If we've changed our Strava connection to a different athlete,
+        // we need to purge the existing activity data, as it's no longer relevant.
+        if ($previousAthleteId !== $newStravaConnection->athlete_id) {
+            app(StravaActivitiesService::class)->purgeExistingActivities($user);
+            // TODO - initialize webhook subscription and pull in activities
+        }
+
+        return $newStravaConnection;
     }
 }
