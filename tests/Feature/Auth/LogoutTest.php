@@ -17,8 +17,15 @@ class LogoutTest extends TestCase
 
         $this->actingAs($user);
 
+        $oldSessionId = session()->getId();
+        $oldCsrfToken = csrf_token();
+
         $this->post(route('logout'));
 
+        $response->assertRedirect(route('login'));
+
         $this->assertGuest();
+        $this->assertNotEquals($oldSessionId, session()->getId());
+        $this->assertNotEquals($oldCsrfToken, csrf_token());
     }
 }
