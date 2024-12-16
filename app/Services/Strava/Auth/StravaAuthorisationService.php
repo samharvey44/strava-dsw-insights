@@ -2,10 +2,10 @@
 
 namespace App\Services\Strava\Auth;
 
+use App\Events\StravaConnectionEstablishedEvent;
 use App\Http\Integrations\Strava\StravaHttpClient;
 use App\Models\StravaConnection;
 use App\Models\User;
-use App\Services\Strava\Activities\StravaActivitiesService;
 
 class StravaAuthorisationService
 {
@@ -69,12 +69,7 @@ class StravaAuthorisationService
 
         $newStravaConnection->save();
 
-        // If we've changed our Strava connection to a different athlete,
-        // we need to purge the existing activity data, as it's no longer relevant.
-        if ($previousAthleteId !== $newStravaConnection->athlete_id) {
-            app(StravaActivitiesService::class)->purgeExistingActivities($user);
-            // TODO - initialize webhook subscription and pull in activities
-        }
+        StravaConnectionEstablishedEvent::dispatch($newStravaConnection, $previousAthleteId === $newStravaConnection->athlete_id);
 
         return $newStravaConnection;
     }

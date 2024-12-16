@@ -12,7 +12,7 @@ class HomeTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCanViewHomePage(): void
+    public function test_view_home_page(): void
     {
         $stravaAuthorisationServiceMock = Mockery::mock(StravaAuthorisationService::class);
         $stravaAuthorisationServiceMock->shouldReceive('generateAuthorisationLink')
@@ -26,6 +26,7 @@ class HomeTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertStatus(200);
+        $response->assertViewIs('pages.home.index');
         $response->assertViewHas('stravaAuthorisationLink', 'some-url');
     }
 }
