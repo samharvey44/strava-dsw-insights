@@ -4,14 +4,13 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class LogoutTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testUserIsLoggedOut(): void
+    public function test_user_logged_out(): void
     {
         $user = User::factory()->create();
 
@@ -20,7 +19,7 @@ class LogoutTest extends TestCase
         $oldSessionId = session()->getId();
         $oldCsrfToken = csrf_token();
 
-        $this->post(route('logout'));
+        $response = $this->post(route('logout'));
 
         $response->assertRedirect(route('login'));
 

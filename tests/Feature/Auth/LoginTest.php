@@ -20,15 +20,16 @@ class LoginTest extends TestCase
         ];
     }
 
-    public function testCanViewLoginPage(): void
+    public function test_view_login_page(): void
     {
         $response = $this->get(route('login'));
 
         $response->assertStatus(200);
+        $response->assertViewIs('pages.auth.login');
     }
 
     #[DataProvider('rememberMeDataProvider')]
-    public function testCanLoginWithValidCredentials(?string $rememberMe): void
+    public function test_login_with_valid_credentials(?string $rememberMe): void
     {
         $user = User::factory()->create();
 
@@ -50,7 +51,7 @@ class LoginTest extends TestCase
     }
 
     #[DataProvider('rememberMeDataProvider')]
-    public function testErrorIsDisplayedWithInvalidCredentials(?string $rememberMe): void
+    public function test_login_with_invalid_credentials(?string $rememberMe): void
     {
         $response = $this->post(route('login.action'), [
             'email' => 'notexistinguser@test.com',

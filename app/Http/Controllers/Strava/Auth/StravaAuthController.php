@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Strava;
+namespace App\Http\Controllers\Strava\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -18,7 +18,7 @@ class StravaAuthController extends Controller
         $user = $request->query('user') ? User::find($request->query('user')) : null;
 
         if ($accessDenied || $codeQueryParamMissing || is_null($user)) {
-            return redirect()->route('strava-auth.unsuccessful');
+            return redirect()->signedRoute('strava-auth.unsuccessful');
         }
 
         $connection = app(StravaAuthorisationService::class)->performTokenExchange(
@@ -27,10 +27,10 @@ class StravaAuthController extends Controller
         );
 
         if (is_null($connection)) {
-            return redirect()->route('strava-auth.unsuccessful');
+            return redirect()->signedRoute('strava-auth.unsuccessful');
         }
 
-        return redirect()->route('strava-auth.successful');
+        return redirect()->signedRoute('strava-auth.successful');
     }
 
     public function successful(): View

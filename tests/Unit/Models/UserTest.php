@@ -11,25 +11,7 @@ class UserTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testHasActiveStravaConnectionReturnsFalseWhenNoConnectionExists(): void
-    {
-        $user = User::factory()->create();
-
-        $this->assertFalse($user->hasActiveStravaConnection());
-    }
-
-    public function testHasActiveStravaConnectionReturnsFalseWhenNoActiveConnectionExists(): void
-    {
-        $user = User::factory()->create();
-        StravaConnection::factory()->create([
-            'user_id' => $user->id,
-            'active' => false,
-        ]);
-
-        $this->assertFalse($user->hasActiveStravaConnection());
-    }
-
-    public function testHasActiveStravaConnectionReturnsTrueWhenActiveConnectionExists(): void
+    public function test_has_active_strava_connection_with_active_connection(): void
     {
         $user = User::factory()->create();
         StravaConnection::factory()->create([
@@ -38,5 +20,23 @@ class UserTest extends TestCase
         ]);
 
         $this->assertTrue($user->hasActiveStravaConnection());
+    }
+
+    public function test_has_active_strava_connection_with_no_existing_connection(): void
+    {
+        $user = User::factory()->create();
+
+        $this->assertFalse($user->hasActiveStravaConnection());
+    }
+
+    public function test_has_active_strava_connection_with_inactive_connection(): void
+    {
+        $user = User::factory()->create();
+        StravaConnection::factory()->create([
+            'user_id' => $user->id,
+            'active' => false,
+        ]);
+
+        $this->assertFalse($user->hasActiveStravaConnection());
     }
 }
