@@ -10,6 +10,7 @@ use Event;
 use Http;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
+use Str;
 use Tests\TestCase;
 
 class StravaAuthorisationServiceTest extends TestCase
@@ -20,48 +21,56 @@ class StravaAuthorisationServiceTest extends TestCase
     {
         config(['strava.redirect_uri' => 'some-uri']);
 
-        $user = User::factory()->create();
+        Str::createRandomStringsUsing(fn () => 'state');
 
-        $service = app(StravaAuthorisationService::class);
+        try {
+            $service = app(StravaAuthorisationService::class);
 
-        $link = $service->generateAuthorisationLink($user);
+            $link = $service->generateAuthorisationLink('state');
 
-        $expectedQueryString = http_build_query([
-            'client_id' => config('strava.client_id'),
-            'redirect_uri' => "some-uri?user={$user->id}",
-            'response_type' => 'code',
-            'approval_prompt' => 'auto',
-            'scope' => 'read,activity:read_all',
-        ]);
+            $expectedQueryString = http_build_query([
+                'client_id' => config('strava.client_id'),
+                'redirect_uri' => sprintf('some-uri?%s=%s', StravaAuthorisationService::AUTHORISATION_STATE_KEY, 'state'),
+                'response_type' => 'code',
+                'approval_prompt' => 'auto',
+                'scope' => 'read,activity:read_all',
+            ]);
 
-        $this->assertEquals(
-            sprintf('https://www.strava.com/oauth/authorize?%s', $expectedQueryString),
-            $link,
-        );
+            $this->assertEquals(
+                sprintf('https://www.strava.com/oauth/authorize?%s', $expectedQueryString),
+                $link,
+            );
+        } finally {
+            Str::createRandomStringsNormally();
+        }
     }
 
     public function test_strava_authorisation_link_generation_with_redirect_uri_not_set_in_config(): void
     {
         config(['strava.redirect_uri' => null]);
 
-        $user = User::factory()->create();
+        Str::createRandomStringsUsing(fn () => 'state');
 
-        $service = app(StravaAuthorisationService::class);
+        try {
+            $service = app(StravaAuthorisationService::class);
 
-        $link = $service->generateAuthorisationLink($user);
+            $link = $service->generateAuthorisationLink('state');
 
-        $expectedQueryString = http_build_query([
-            'client_id' => config('strava.client_id'),
-            'redirect_uri' => route('strava-auth.redirect')."?user={$user->id}",
-            'response_type' => 'code',
-            'approval_prompt' => 'auto',
-            'scope' => 'read,activity:read_all',
-        ]);
+            $expectedQueryString = http_build_query([
+                'client_id' => config('strava.client_id'), //
+                'redirect_uri' => sprintf('%s?%s=%s', route('strava-auth.redirect'), StravaAuthorisationService::AUTHORISATION_STATE_KEY, 'state'),
+                'response_type' => 'code',
+                'approval_prompt' => 'auto',
+                'scope' => 'read,activity:read_all',
+            ]);
 
-        $this->assertEquals(
-            sprintf('https://www.strava.com/oauth/authorize?%s', $expectedQueryString),
-            $link,
-        );
+            $this->assertEquals(
+                sprintf('https://www.strava.com/oauth/authorize?%s', $expectedQueryString),
+                $link,
+            );
+        } finally {
+            Str::createRandomStringsNormally();
+        }
     }
 
     public function test_successful_token_exchange_with_no_previous_connection(): void
