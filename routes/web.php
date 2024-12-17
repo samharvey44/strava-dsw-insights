@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Strava\Auth\StravaAuthController;
+use App\Http\Controllers\Strava\Webhooks\StravaWebhooksController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -19,8 +20,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('/home')->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
     });
+});
 
-    Route::prefix('/strava-auth')->name('strava-auth.')->group(function () {
+Route::prefix('/strava')->group(function () {
+    Route::prefix('/auth')->middleware('auth')->name('strava-auth.')->group(function () {
         Route::get('/initiate', [StravaAuthController::class, 'initiateAuthorisation'])->name('initiate');
         Route::get('/redirect', [StravaAuthController::class, 'redirect'])->name('redirect');
 
@@ -29,4 +32,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/unsuccessful', [StravaAuthController::class, 'unsuccessful'])->name('unsuccessful');
         });
     });
+
+    Route::get(
+        '/webhook-updates-'.config('strava.webhook_callback_uri_suffix'),
+        StravaWebhooksController::class
+    )->name('webhook-updates');
 });

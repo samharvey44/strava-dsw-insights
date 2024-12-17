@@ -15,7 +15,7 @@ class StravaAuthController extends Controller
     {
         $state = Str::random(30);
 
-        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_KEY, $state);
+        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY, $state);
 
         return redirect(app(StravaAuthorisationService::class)->generateAuthorisationLink($state));
     }
@@ -24,13 +24,13 @@ class StravaAuthController extends Controller
     {
         $accessDenied = $request->query('error') === 'access_denied';
         $codeQueryParamMissing = is_null($request->query('code'));
-        $stateMissingOrInvalid = ! $request->query(StravaAuthorisationService::AUTHORISATION_STATE_KEY)
-            || $request->query(StravaAuthorisationService::AUTHORISATION_STATE_KEY) !== session()->get(StravaAuthorisationService::AUTHORISATION_STATE_KEY);
+        $stateQueryParamMissingOrInvalid = ! $request->query('state')
+            || $request->query('state') !== session()->get(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY);
 
         // We've validated our session state, so can remove it now.
-        session()->forget(StravaAuthorisationService::AUTHORISATION_STATE_KEY);
+        session()->forget(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY);
 
-        if ($accessDenied || $codeQueryParamMissing || $stateMissingOrInvalid) {
+        if ($accessDenied || $codeQueryParamMissing || $stateQueryParamMissingOrInvalid) {
             return redirect()->signedRoute('strava-auth.unsuccessful');
         }
 

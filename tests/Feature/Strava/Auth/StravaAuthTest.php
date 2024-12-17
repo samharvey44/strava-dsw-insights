@@ -33,7 +33,7 @@ class StravaAuthTest extends TestCase
 
             $response = $this->get(route('strava-auth.initiate'));
 
-            $response->assertSessionHas(StravaAuthorisationService::AUTHORISATION_STATE_KEY, 'state');
+            $response->assertSessionHas(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY, 'state');
             $response->assertRedirect('https://strava.com/oauth/authorize');
         } finally {
             Str::createRandomStringsNormally();
@@ -56,17 +56,17 @@ class StravaAuthTest extends TestCase
 
         $this->actingAs($user);
 
-        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_KEY, 'state');
+        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY, 'state');
 
         $route = route('strava-auth.redirect', [
             'code' => 'code',
-            StravaAuthorisationService::AUTHORISATION_STATE_KEY => 'state',
+            'state' => 'state',
         ]);
 
         $response = $this->get($route);
 
         $response->assertRedirectToSignedRoute('strava-auth.successful');
-        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_KEY);
+        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY);
     }
 
     public function test_strava_redirect_with_access_denied_error(): void
@@ -79,17 +79,17 @@ class StravaAuthTest extends TestCase
 
         $this->actingAs($user);
 
-        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_KEY, 'state');
+        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY, 'state');
 
         $route = route('strava-auth.redirect', [
             'error' => 'access_denied',
-            StravaAuthorisationService::AUTHORISATION_STATE_KEY => 'state',
+            'state' => 'state',
         ]);
 
         $response = $this->get($route);
 
         $response->assertRedirectToSignedRoute('strava-auth.unsuccessful');
-        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_KEY);
+        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY);
     }
 
     public function test_strava_redirect_with_missing_code_query_param(): void
@@ -102,16 +102,16 @@ class StravaAuthTest extends TestCase
 
         $this->actingAs($user);
 
-        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_KEY, 'state');
+        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY, 'state');
 
         $route = route('strava-auth.redirect', [
-            StravaAuthorisationService::AUTHORISATION_STATE_KEY => 'state',
+            'state' => 'state',
         ]);
 
         $response = $this->get($route);
 
         $response->assertRedirectToSignedRoute('strava-auth.unsuccessful');
-        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_KEY);
+        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY);
     }
 
     public function test_strava_redirect_with_missing_state_query_param(): void
@@ -123,6 +123,8 @@ class StravaAuthTest extends TestCase
         app()->instance(StravaAuthorisationService::class, $mockedStravaAuthorisationService);
 
         $this->actingAs($user);
+
+        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY, 'state');
 
         $route = route('strava-auth.redirect', [
             'code' => 'code',
@@ -143,17 +145,17 @@ class StravaAuthTest extends TestCase
 
         $this->actingAs($user);
 
-        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_KEY, 'state');
+        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY, 'state');
 
         $route = route('strava-auth.redirect', [
             'code' => 'code',
-            StravaAuthorisationService::AUTHORISATION_STATE_KEY => 'invalid',
+            'state' => 'invalid',
         ]);
 
         $response = $this->get($route);
 
         $response->assertRedirectToSignedRoute('strava-auth.unsuccessful');
-        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_KEY);
+        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY);
     }
 
     public function test_strava_redirect_with_unsuccessful_token_exchange(): void
@@ -172,17 +174,17 @@ class StravaAuthTest extends TestCase
 
         $this->actingAs($user);
 
-        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_KEY, 'state');
+        session()->put(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY, 'state');
 
         $route = route('strava-auth.redirect', [
             'code' => 'code',
-            StravaAuthorisationService::AUTHORISATION_STATE_KEY => 'state',
+            'state' => 'state',
         ]);
 
         $response = $this->get($route);
 
         $response->assertRedirectToSignedRoute('strava-auth.unsuccessful');
-        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_KEY);
+        $response->assertSessionMissing(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY);
     }
 
     public function test_view_authorisation_successful(): void
