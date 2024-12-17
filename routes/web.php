@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('/strava-auth')->name('strava-auth.')->group(function () {
+        Route::get('/initiate', [StravaAuthController::class, 'initiateAuthorisation'])->name('initiate');
         Route::get('/redirect', [StravaAuthController::class, 'redirect'])->name('redirect');
 
         Route::middleware('signed')->group(function () {

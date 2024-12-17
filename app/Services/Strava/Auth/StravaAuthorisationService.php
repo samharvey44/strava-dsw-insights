@@ -9,10 +9,12 @@ use App\Models\User;
 
 class StravaAuthorisationService
 {
-    public function generateAuthorisationLink(User $user): string
+    public const string AUTHORISATION_STATE_KEY = 'strava_authorisation_state';
+
+    public function generateAuthorisationLink(string $state): string
     {
         $redirectUriQueryString = http_build_query([
-            'user' => $user->id,
+            self::AUTHORISATION_STATE_KEY => $state,
         ]);
         $redirectUri = sprintf(
             '%s?%s',
