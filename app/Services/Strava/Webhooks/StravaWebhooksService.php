@@ -50,10 +50,14 @@ class StravaWebhooksService
             return;
         }
 
-        $response = app(StravaHttpClient::class)->delete("push_subscriptions/{$subscription->strava_subscription_id}", [
+        $authorisationQueryString = http_build_query([
             'client_id' => config('strava.client_id'),
             'client_secret' => config('strava.client_secret'),
         ]);
+
+        $response = app(StravaHttpClient::class)->delete(
+            "push_subscriptions/{$subscription->strava_subscription_id}?{$authorisationQueryString}"
+        );
 
         if ($response->failed()) {
             $response->throw();
