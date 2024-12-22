@@ -6,7 +6,7 @@
                 Please connect your Strava account to view your insights.
 
                 <div class="mt-3">
-                    <a href="{{ route('strava-auth.initiate') }}" class="btn btn-warning">
+                    <a href="{{ route('strava.auth.initiate') }}" class="btn btn-warning">
                         <i class="bi bi-link"></i>
                         Connect Strava
                     </a>

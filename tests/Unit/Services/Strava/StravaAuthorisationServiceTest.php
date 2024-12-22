@@ -51,7 +51,7 @@ class StravaAuthorisationServiceTest extends TestCase
 
         $expectedQueryString = http_build_query([
             'client_id' => config('strava.client_id'),
-            'redirect_uri' => route('strava-auth.redirect'),
+            'redirect_uri' => route('strava.auth.redirect'),
             'response_type' => 'code',
             'approval_prompt' => 'auto',
             'scope' => 'read,activity:read_all',
