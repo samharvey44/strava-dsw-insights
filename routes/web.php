@@ -33,7 +33,8 @@ Route::prefix('/strava')->name('strava.')->group(function () {
         });
     });
 
-    Route::get(
+    Route::match(
+        ['GET', 'POST'],
         '/webhook-updates-'.config('strava.webhook_callback_uri_suffix'),
         StravaWebhooksController::class
     )->name('webhook-updates');
