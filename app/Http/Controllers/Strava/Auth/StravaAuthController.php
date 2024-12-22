@@ -31,7 +31,7 @@ class StravaAuthController extends Controller
         session()->forget(StravaAuthorisationService::AUTHORISATION_STATE_SESSION_KEY);
 
         if ($accessDenied || $codeQueryParamMissing || $stateQueryParamMissingOrInvalid) {
-            return redirect()->signedRoute('strava-auth.unsuccessful');
+            return redirect()->signedRoute('strava.auth.unsuccessful');
         }
 
         $connection = app(StravaAuthorisationService::class)->performTokenExchange(
@@ -40,10 +40,10 @@ class StravaAuthController extends Controller
         );
 
         if (is_null($connection)) {
-            return redirect()->signedRoute('strava-auth.unsuccessful');
+            return redirect()->signedRoute('strava.auth.unsuccessful');
         }
 
-        return redirect()->signedRoute('strava-auth.successful');
+        return redirect()->signedRoute('strava.auth.successful');
     }
 
     public function successful(): View

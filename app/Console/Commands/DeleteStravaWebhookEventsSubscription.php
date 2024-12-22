@@ -17,13 +17,13 @@ class DeleteStravaWebhookEventsSubscription extends Command
         $subscription = StravaWebhookSubscription::latest()->first();
 
         if (! $subscription) {
-            $this->info('No subscription found!');
+            $this->error('No subscription found!');
 
             return;
         }
 
         app(StravaWebhooksService::class)->deleteExistingSubscription();
 
-        $this->error('Subscription deleted successfully!');
+        $this->info('Subscription deleted successfully!');
     }
 }

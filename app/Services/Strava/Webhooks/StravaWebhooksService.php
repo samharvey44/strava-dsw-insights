@@ -26,7 +26,7 @@ class StravaWebhooksService
         $response = app(StravaHttpClient::class)->post('push_subscriptions', [
             'client_id' => config('strava.client_id'),
             'client_secret' => config('strava.client_secret'),
-            'callback_url' => config('strava.webhook_callback_uri') ?? route('webhook-updates'),
+            'callback_url' => config('strava.webhook_callback_uri') ?? route('strava.webhook-updates'),
             'verify_token' => config('strava.webhook_verify_token'),
         ]);
 
@@ -35,10 +35,10 @@ class StravaWebhooksService
         }
 
         // Purge any existing records we have, since Strava only allows one subscription at a time.
-        StravaWebhookSubscription::delete();
+        StravaWebhookSubscription::query()->delete();
 
         StravaWebhookSubscription::create([
-            'subscription_id' => $response->json('id'),
+            'strava_subscription_id' => $response->json('id'),
         ]);
     }
 

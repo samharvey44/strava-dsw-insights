@@ -16,7 +16,7 @@ class RegisterStravaWebhookEventsSubscription extends Command
         $existingSubscriptionId = app(StravaWebhooksService::class)->checkExistingSubscription();
 
         if ($existingSubscriptionId) {
-            $this->info("Subscription already exists with ID: {$existingSubscriptionId}");
+            $this->error("Subscription already exists with ID: {$existingSubscriptionId}");
 
             return;
         }

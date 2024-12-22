@@ -15,7 +15,7 @@ class StravaAuthorisationService
     {
         $stravaAuthorisationQueryString = http_build_query([
             'client_id' => config('strava.client_id'),
-            'redirect_uri' => config('strava.auth_redirect_uri') ?? route('strava-auth.redirect'),
+            'redirect_uri' => config('strava.auth_redirect_uri') ?? route('strava.auth.redirect'),
             'response_type' => 'code',
             'approval_prompt' => 'auto',
             'scope' => 'read,activity:read_all',
