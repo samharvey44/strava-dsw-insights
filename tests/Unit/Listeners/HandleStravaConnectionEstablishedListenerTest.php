@@ -1,6 +1,6 @@
 <?php
 
-namespace Listeners;
+namespace Tests\Unit\Listeners;
 
 use App\Events\StravaConnectionEstablishedEvent;
 use App\Listeners\HandleStravaConnectionEstablishedListener;
