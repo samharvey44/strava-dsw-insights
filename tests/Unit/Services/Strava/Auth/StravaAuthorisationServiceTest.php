@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Services\Strava;
+namespace Tests\Unit\Services\Strava\Auth;
 
 use App\Events\StravaConnectionEstablishedEvent;
 use App\Models\StravaConnection;
@@ -213,5 +213,105 @@ class StravaAuthorisationServiceTest extends TestCase
         });
 
         $this->assertDatabaseCount('strava_connections', 0);
+    }
+
+    public function test_successful_refresh_access_token(): void
+    {
+        config([
+            'strava.client_id' => 'client-id',
+            'strava.client_secret' => 'client-secret',
+        ]);
+
+        $connection = StravaConnection::factory()->create([
+            'user_id' => User::factory()->create()->id,
+            'access_token' => encrypt('old-access-token'),
+            'refresh_token' => encrypt('old-refresh-token'),
+            'access_token_expiry' => now()->subSeconds(123)->getTimestamp(),
+            'active' => true,
+        ]);
+
+        $service = app(StravaAuthorisationService::class);
+
+        Http::fake([
+            'https://www.strava.com/api/v3/oauth/token' => Http::response([
+                'athlete' => [
+                    'id' => 123,
+                ],
+                'access_token' => 'new-access-token',
+                'expires_in' => 123,
+                'refresh_token' => 'new-refresh-token',
+            ]),
+        ]);
+
+        $this->freezeSecond();
+
+        $result = $service->refreshAccessToken($connection);
+
+        $this->assertTrue($result);
+
+        Http::assertSent(function (Request $request) {
+            return $request->method() === 'POST'
+                && $request['client_id'] === 'client-id'
+                && $request['client_secret'] === 'client-secret'
+                && $request['refresh_token'] === 'old-refresh-token'
+                && $request['grant_type'] === 'refresh_token';
+        });
+
+        $this->assertDatabaseCount('strava_connections', 1);
+        $this->assertDatabaseHas('strava_connections', [
+            'id' => $connection->id,
+            'user_id' => $connection->user_id,
+            'access_token_expiry' => now()->addSeconds(123)->getTimestamp(),
+            'active' => true,
+        ]);
+
+        $this->assertEquals('new-access-token', decrypt($connection->access_token));
+        $this->assertEquals('new-refresh-token', decrypt($connection->refresh_token));
+    }
+
+    public function test_unsuccessful_refresh_access_token(): void
+    {
+        config([
+            'strava.client_id' => 'client-id',
+            'strava.client_secret' => 'client-secret',
+        ]);
+
+        $this->freezeSecond();
+
+        $connection = StravaConnection::factory()->create([
+            'user_id' => User::factory()->create()->id,
+            'access_token' => encrypt('old-access-token'),
+            'refresh_token' => encrypt('old-refresh-token'),
+            'access_token_expiry' => now()->subSeconds(123)->getTimestamp(),
+            'active' => true,
+        ]);
+
+        $service = app(StravaAuthorisationService::class);
+
+        Http::fake([
+            'https://www.strava.com/api/v3/oauth/token' => Http::response([], 400),
+        ]);
+
+        $result = $service->refreshAccessToken($connection);
+        $this->assertFalse($result);
+
+        Http::assertSent(function (Request $request) {
+            return $request->method() === 'POST'
+                && $request['client_id'] === 'client-id'
+                && $request['client_secret'] === 'client-secret'
+                && $request['refresh_token'] === 'old-refresh-token'
+                && $request['grant_type'] === 'refresh_token';
+        });
+
+        $this->assertDatabaseCount('strava_connections', 1);
+        $this->assertDatabaseHas('strava_connections', [
+            'id' => $connection->id,
+            'user_id' => $connection->user_id,
+            'access_token_expiry' => now()->subSeconds(123)->getTimestamp(),
+            'active' => false,
+        ]);
+
+        $this->assertEquals('old-access-token', decrypt($connection->access_token));
+        $this->assertEquals('old-refresh-token', decrypt($connection->refresh_token));
     }
 }

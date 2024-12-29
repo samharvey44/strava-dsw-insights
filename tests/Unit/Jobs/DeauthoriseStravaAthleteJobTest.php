@@ -1,6 +1,6 @@
 <?php
 
-namespace Jobs;
+namespace Tests\Unit\Jobs;
 
 use App\Jobs\DeauthoriseStravaAthleteJob;
 use App\Models\StravaConnection;

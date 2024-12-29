@@ -67,4 +67,35 @@ class StravaAuthorisationService
 
         return $newStravaConnection;
     }
+
+    public function refreshAccessToken(StravaConnection $stravaConnection): bool
+    {
+        $response = app(StravaHttpClient::class)->post(
+            'oauth/token',
+            [
+                'client_id' => config('strava.client_id'),
+                'client_secret' => config('strava.client_secret'),
+                'refresh_token' => decrypt($stravaConnection->refresh_token),
+                'grant_type' => 'refresh_token',
+            ]
+        );
+
+        if ($response->failed()) {
+            $stravaConnection->disable();
+
+            return false;
+        }
+
+        $responseJson = $response->json();
+
+        $stravaConnection->fill([
+            'access_token' => encrypt($responseJson['access_token']),
+            'refresh_token' => encrypt($responseJson['refresh_token']),
+            'access_token_expiry' => now()->addSeconds($responseJson['expires_in'])->getTimestamp(),
+        ]);
+
+        $stravaConnection->save();
+
+        return true;
+    }
 }
