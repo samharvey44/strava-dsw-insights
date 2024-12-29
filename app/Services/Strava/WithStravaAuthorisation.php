@@ -9,9 +9,9 @@ trait WithStravaAuthorisation
 {
     public function withStravaAuthorisation(StravaConnection $stravaConnection, callable $callback): mixed
     {
-        $tokenHasExpired = now()->subMinute()->getTimestamp() > $stravaConnection->access_token_expiry;
+        $accessTokenIsExpired = now()->addMinute()->getTimestamp() >= $stravaConnection->access_token_expiry;
 
-        if ($tokenHasExpired) {
+        if ($accessTokenIsExpired) {
             $successfullyRefreshed = app(StravaAuthorisationService::class)->refreshAccessToken($stravaConnection);
 
             if (! $successfullyRefreshed) {

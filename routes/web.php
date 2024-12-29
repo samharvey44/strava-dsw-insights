@@ -7,8 +7,9 @@ use App\Http\Controllers\Strava\Auth\StravaAuthController;
 use App\Http\Controllers\Strava\Webhooks\StravaWebhooksController;
 use Illuminate\Support\Facades\Route;
 
+// TODO - remove this
 Route::get('/test', fn () => app(\App\Listeners\HandleStravaConnectionEstablishedListener::class)->handle(
-    new \App\Events\StravaConnectionEstablishedEvent(\App\Models\StravaConnection::latest()->first())
+    new \App\Events\StravaConnectionEstablishedEvent(\App\Models\StravaConnection::latest()->first(), true)
 ));
 
 Route::middleware('guest')->group(function () {

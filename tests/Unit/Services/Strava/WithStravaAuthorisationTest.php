@@ -22,15 +22,15 @@ class WithStravaAuthorisationTest extends TestCase
             use WithStravaAuthorisation;
         };
 
+        $this->freezeSecond();
+
         $mockedStravaAuthorisationService = Mockery::mock(StravaAuthorisationService::class);
         $mockedStravaAuthorisationService->shouldNotReceive('refreshAccessToken');
         app()->instance(StravaAuthorisationService::class, $mockedStravaAuthorisationService);
 
-        $this->freezeSecond();
-
         $stravaConnection = StravaConnection::factory()->create([
             'user_id' => User::factory()->create()->id,
-            'access_token_expiry' => now()->subSeconds(59)->getTimestamp(),
+            'access_token_expiry' => now()->addSeconds(61)->getTimestamp(),
         ]);
 
         $classWithTrait->withStravaAuthorisation($stravaConnection, function ($stravaConnection) {
@@ -45,9 +45,11 @@ class WithStravaAuthorisationTest extends TestCase
             use WithStravaAuthorisation;
         };
 
+        $this->freezeSecond();
+
         $stravaConnection = StravaConnection::factory()->create([
             'user_id' => User::factory()->create()->id,
-            'access_token_expiry' => now()->subSeconds(61)->getTimestamp(),
+            'access_token_expiry' => now()->addMinute()->getTimestamp(),
         ]);
 
         $mockedStravaAuthorisationService = Mockery::mock(StravaAuthorisationService::class);
@@ -71,9 +73,11 @@ class WithStravaAuthorisationTest extends TestCase
             use WithStravaAuthorisation;
         };
 
+        $this->freezeSecond();
+
         $stravaConnection = StravaConnection::factory()->create([
             'user_id' => User::factory()->create()->id,
-            'access_token_expiry' => now()->subSeconds(61)->getTimestamp(),
+            'access_token_expiry' => now()->addMinute()->getTimestamp(),
         ]);
 
         $mockedStravaAuthorisationService = Mockery::mock(StravaAuthorisationService::class);
