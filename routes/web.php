@@ -7,6 +7,10 @@ use App\Http\Controllers\Strava\Auth\StravaAuthController;
 use App\Http\Controllers\Strava\Webhooks\StravaWebhooksController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/test', fn () => app(\App\Listeners\HandleStravaConnectionEstablishedListener::class)->handle(
+    new \App\Events\StravaConnectionEstablishedEvent(\App\Models\StravaConnection::latest()->first())
+));
+
 Route::middleware('guest')->group(function () {
     Route::prefix('/login')->group(function () {
         Route::get('/', [LoginController::class, 'index'])->name('login');

@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('strava_connections', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignUuid('user_id')->unique()->constrained()->onDelete('cascade');
+            $table->foreignUuid('user_id')->unique()->constrained()->cascadeOnDelete();
             $table->unsignedBigInteger('athlete_id');
 
             $table->text('access_token');

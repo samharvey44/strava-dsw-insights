@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Services\Strava;
+namespace Tests\Unit\Services\Strava\Webhooks;
 
 use App\Models\StravaWebhookSubscription;
 use App\Services\Strava\Webhooks\StravaWebhooksService;
