@@ -24,7 +24,7 @@ class StravaRawActivity extends Model
 
     public function stravaActivity(): HasOne
     {
-        return $this->hasOne(StravaActivity::class, 'strava_activity_id');
+        return $this->hasOne(StravaActivity::class, 'strava_raw_activity_id');
     }
 
     protected function casts(): array
