@@ -21,53 +21,60 @@ class StravaActivitiesService
 
     public function fetchActivities(StravaConnection $stravaConnection): void
     {
-        $this->withStravaAuthorisation($stravaConnection, function (StravaConnection $stravaConnection) {
+        DB::transaction(function () use ($stravaConnection) {
             $page = 1;
             $perPage = 50;
+            $resultsAreRemaining = true;
 
-            DB::transaction(function () use ($stravaConnection, $page, $perPage) {
-                while (true) {
-                    $response = app(StravaHttpClient::class)->get(
-                        'athlete/activities',
-                        [
-                            'page' => $page,
-                            'per_page' => $perPage,
-                        ],
-                        forUser: $stravaConnection->user,
-                    );
+            while ($resultsAreRemaining) {
+                $this->withStravaAuthorisation(
+                    $stravaConnection,
+                    function (StravaConnection $stravaConnection) use (&$page, $perPage, &$resultsAreRemaining) {
+                        $response = app(StravaHttpClient::class)->get(
+                            'athlete/activities',
+                            [
+                                'page' => $page,
+                                'per_page' => $perPage,
+                            ],
+                            forUser: $stravaConnection->user,
+                        );
 
-                    if ($response->failed()) {
-                        $response->throw();
-                    }
+                        if ($response->failed()) {
+                            $response->throw();
+                        }
 
-                    $responseJson = $response->json();
+                        $responseJson = $response->json();
 
-                    if (empty($responseJson)) {
-                        break;
-                    }
+                        if (empty($responseJson)) {
+                            $resultsAreRemaining = false;
 
-                    $activitiesAlreadyStoredFromPage = StravaRawActivity::select('strava_activity_id')
-                        ->where('strava_connection_id', $stravaConnection->id)
-                        ->whereIn('strava_activity_id', array_column($responseJson, 'id'))
-                        ->get()
-                        ->keyBy('strava_activity_id');
-                    $activitiesToStore = array_filter(
-                        $responseJson,
-                        fn ($activity) => empty($activitiesAlreadyStoredFromPage[$activity['id']])
-                            && $activity['sport_type'] === 'Run'
-                    );
+                            return;
+                        }
 
-                    foreach ($activitiesToStore as $activityToStore) {
-                        $this->storeActivity($stravaConnection, $activityToStore);
-                    }
+                        $activitiesAlreadyStoredFromPage = StravaRawActivity::select('strava_activity_id')
+                            ->where('strava_connection_id', $stravaConnection->id)
+                            ->whereIn('strava_activity_id', array_column($responseJson, 'id'))
+                            ->get()
+                            ->keyBy('strava_activity_id');
+                        $activitiesToStore = array_filter(
+                            $responseJson,
+                            fn ($activity) => empty($activitiesAlreadyStoredFromPage[$activity['id']])
+                                && $activity['sport_type'] === 'Run'
+                        );
 
-                    if (count($responseJson) < $perPage) {
-                        break;
-                    }
+                        foreach ($activitiesToStore as $activityToStore) {
+                            $this->storeActivity($stravaConnection, $activityToStore);
+                        }
 
-                    $page++;
-                }
-            });
+                        if (count($responseJson) < $perPage) {
+                            $resultsAreRemaining = false;
+
+                            return;
+                        }
+
+                        $page++;
+                    });
+            }
         });
     }
 
