@@ -3,8 +3,10 @@
 namespace Tests\Feature\Strava\Webhooks;
 
 use App\Jobs\DeauthoriseStravaAthleteJob;
+use App\Jobs\HandleStravaActivityWebhookJob;
 use App\Models\StravaConnection;
 use App\Models\User;
+use App\Services\Strava\StravaWebhookAspectTypeEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Queue;
 use Tests\TestCase;
@@ -69,6 +71,78 @@ class StravaWebhooksTest extends TestCase
 
         Queue::assertPushed(DeauthoriseStravaAthleteJob::class, function ($job) {
             return $job->stravaAthleteId === 123;
+        });
+        Queue::assertCount(1);
+    }
+
+    public function test_activity_create_request(): void
+    {
+        Queue::fake();
+
+        $response = $this->postJson(
+            route('strava.webhook-updates'),
+            [
+                'object_type' => 'activity',
+                'aspect_type' => 'create',
+                'owner_id' => 123,
+                'object_id' => 456,
+            ],
+        );
+
+        $response->assertOk();
+
+        Queue::assertPushed(HandleStravaActivityWebhookJob::class, function ($job) {
+            return $job->aspectType === StravaWebhookAspectTypeEnum::CREATE
+                && $job->stravaAthleteId === 123
+                && $job->stravaActivityId === 456;
+        });
+        Queue::assertCount(1);
+    }
+
+    public function test_activity_update_request(): void
+    {
+        Queue::fake();
+
+        $response = $this->postJson(
+            route('strava.webhook-updates'),
+            [
+                'object_type' => 'activity',
+                'aspect_type' => 'update',
+                'owner_id' => 123,
+                'object_id' => 456,
+            ],
+        );
+
+        $response->assertOk();
+
+        Queue::assertPushed(HandleStravaActivityWebhookJob::class, function ($job) {
+            return $job->aspectType === StravaWebhookAspectTypeEnum::UPDATE
+                && $job->stravaAthleteId === 123
+                && $job->stravaActivityId === 456;
+        });
+        Queue::assertCount(1);
+    }
+
+    public function test_activity_delete_request(): void
+    {
+        Queue::fake();
+
+        $response = $this->postJson(
+            route('strava.webhook-updates'),
+            [
+                'object_type' => 'activity',
+                'aspect_type' => 'delete',
+                'owner_id' => 123,
+                'object_id' => 456,
+            ],
+        );
+
+        $response->assertOk();
+
+        Queue::assertPushed(HandleStravaActivityWebhookJob::class, function ($job) {
+            return $job->aspectType === StravaWebhookAspectTypeEnum::DELETE
+                && $job->stravaAthleteId === 123
+                && $job->stravaActivityId === 456;
         });
         Queue::assertCount(1);
     }

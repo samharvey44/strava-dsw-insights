@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class StravaActivity extends Model
 {
@@ -32,6 +34,18 @@ class StravaActivity extends Model
     public function rawActivity(): BelongsTo
     {
         return $this->belongsTo(StravaRawActivity::class, 'strava_raw_activity_id');
+    }
+
+    public function dswAnalysis(): HasOne
+    {
+        return $this->hasOne(StravaActivityDswAnalysis::class, 'strava_activity_id');
+    }
+
+    public function scopeByUser(Builder $query, User $user): void
+    {
+        $query->whereHas('rawActivity', function (Builder $query) use ($user) {
+            $query->where('strava_connection_id', $user->stravaConnection?->id);
+        });
     }
 
     protected function casts(): array
