@@ -14,6 +14,11 @@
           rel="stylesheet"
           crossorigin="anonymous"
     >
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          rel="stylesheet"
+          crossorigin="anonymous"
+    >
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -60,8 +65,15 @@
     {{ $slot }}
 </div>
 
+<input type="hidden" id="gmapsApiKey" value="{{ config('services.google_maps.key') }}">
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"
 ></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        crossorigin="anonymous"
+></script>
+
+@stack('body_scripts')
 </body>
 </html>
