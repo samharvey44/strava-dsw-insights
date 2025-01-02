@@ -59,8 +59,6 @@ class WithStravaAuthorisationTest extends TestCase
             ->andReturnTrue();
         app()->instance(StravaAuthorisationService::class, $mockedStravaAuthorisationService);
 
-        $this->freezeSecond();
-
         $classWithTrait->withStravaAuthorisation($stravaConnection, function ($stravaConnection) {
             //
         });
@@ -86,8 +84,6 @@ class WithStravaAuthorisationTest extends TestCase
             ->with(Mockery::on(fn ($stravaConnectionArg) => $stravaConnectionArg->is($stravaConnection)))
             ->andReturnFalse();
         app()->instance(StravaAuthorisationService::class, $mockedStravaAuthorisationService);
-
-        $this->freezeSecond();
 
         $this->expectException(StravaAuthorisationFailedException::class);
         $this->expectExceptionMessage("Strava authorisation failed for connection ID: {$stravaConnection->id}");
