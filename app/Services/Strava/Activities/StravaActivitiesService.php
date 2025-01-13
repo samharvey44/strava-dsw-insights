@@ -73,6 +73,11 @@ class StravaActivitiesService
                         }
 
                         $page++;
+
+                        if ($page > 20) {
+                            // Limit to 1000 activities.
+                            $resultsAreRemaining = false;
+                        }
                     });
             }
         });

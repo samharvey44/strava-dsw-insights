@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\StravaActivityReadyForDswAnalysisEvent;
 use App\Models\StravaConnection;
 use App\Services\Strava\Activities\StravaActivitiesService;
 use App\Services\Strava\StravaWebhookAspectTypeEnum;
@@ -36,6 +37,11 @@ class HandleStravaActivityWebhookJob extends Job
         app(StravaActivitiesService::class)->fetchActivityByStravaId(
             $stravaConnection,
             $this->stravaActivityId
+        );
+
+        StravaActivityReadyForDswAnalysisEvent::dispatch(
+            $this->stravaAthleteId,
+            $this->stravaActivityId,
         );
     }
 }

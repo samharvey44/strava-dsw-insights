@@ -54,11 +54,10 @@
                             @if($activity->summary_polyline)
                                 <div class="col-md-6 mt-md-0 mt-3">
                                     <div
-                                        x-data
                                         style="height: 300px;"
                                         class="w-100 border border-1 rounded"
                                         id="activity-map-container-{{ $activity->id }}"
-                                        @leaflet-maps-ready.window="window.insertMapWithPolyline('{{ base64_encode($activity->summary_polyline) }}', $el.id)"
+                                        data-map-polyline="{{ base64_encode($activity->summary_polyline) }}"
                                     >
                                     </div>
                                 </div>

@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('strava_activity_id')->unique()->constrained()->onDelete('cascade');
             $table->foreignId('dsw_type_id')->nullable()->constrained()->onDelete('cascade');
             $table->boolean('intervals');
+            $table->boolean('treadmill');
             $table->unsignedInteger('dsw_score');
             $table->text('notes')->nullable();
 
