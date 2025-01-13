@@ -302,6 +302,43 @@ class StravaActivitiesServiceTest extends TestCase
         Http::assertSentCount(1);
     }
 
+    public function test_fetch_activities_more_than_1000_results(): void
+    {
+        $this->freezeSecond();
+
+        $stravaConnection = StravaConnection::factory()->create([
+            'user_id' => User::factory()->create()->id,
+            'access_token' => encrypt('test-access-token'),
+            'access_token_expiry' => now()->addSeconds(61)->getTimestamp(),
+        ]);
+
+        foreach (range(1, 21) as $page) {
+            Http::fake([
+                "https://www.strava.com/api/v3/athlete/activities?page={$page}&per_page=50" => Http::response(
+                    array_fill(0, 50, $this->generateStravaActivityJson()),
+                ),
+            ]);
+        }
+
+        app(StravaActivitiesService::class)->fetchActivities($stravaConnection);
+
+        $this->assertDatabaseCount('strava_raw_activities', 1000);
+        $this->assertDatabaseCount('strava_activities', 1000);
+
+        foreach (range(1, 20) as $page) {
+            Http::assertSent(function (Request $request) use ($page) {
+                return $request->url() === "https://www.strava.com/api/v3/athlete/activities?page={$page}&per_page=50"
+                    && $request->hasHeader('Authorization', 'Bearer test-access-token');
+            });
+        }
+
+        Http::assertNotSent(function (Request $request) {
+            return $request->url() === 'https://www.strava.com/api/v3/athlete/activities?page=21&per_page=50';
+        });
+
+        Http::assertSentCount(20);
+    }
+
     public function test_successful_fetch_run_activity_by_strava_id_not_existing(): void
     {
         $this->freezeSecond();

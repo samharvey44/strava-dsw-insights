@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StravaActivityDswAnalysis extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'strava_activity_id',
         'dsw_type_id',
         'intervals',
+        'treadmill',
         'dsw_score',
         'notes',
     ];
@@ -29,6 +33,7 @@ class StravaActivityDswAnalysis extends Model
     {
         return [
             'intervals' => 'boolean',
+            'treadmill' => 'boolean',
         ];
     }
 }
