@@ -13,6 +13,7 @@ return new class extends Migration
 
             $table->foreignId('strava_raw_activity_id')->unique()->constrained()->cascadeOnDelete();
 
+            $table->boolean('is_summary');
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('distance_meters', 10);

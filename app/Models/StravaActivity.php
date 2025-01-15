@@ -14,6 +14,7 @@ class StravaActivity extends Model
 
     protected $fillable = [
         'strava_raw_activity_id',
+        'is_summary',
         'name',
         'description',
         'distance_meters',
@@ -51,6 +52,7 @@ class StravaActivity extends Model
     protected function casts(): array
     {
         return [
+            'is_summary' => 'boolean',
             'elevation_gain_meters' => 'decimal:2',
             'started_at' => 'datetime',
             'average_speed_meters_per_second' => 'decimal:2',

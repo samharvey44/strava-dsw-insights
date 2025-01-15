@@ -63,7 +63,7 @@ class StravaActivitiesService
                         );
 
                         foreach ($activitiesToStore as $activityToStore) {
-                            $this->storeActivity($stravaConnection, $activityToStore);
+                            $this->storeActivity($stravaConnection, $activityToStore, true);
                         }
 
                         if (count($responseJson) < $perPage) {
@@ -112,7 +112,7 @@ class StravaActivitiesService
                 return;
             }
 
-            $this->storeActivity($stravaConnection, $activityData, $existingActivity);
+            $this->storeActivity($stravaConnection, $activityData, false, $existingActivity);
         });
     }
 
@@ -126,6 +126,7 @@ class StravaActivitiesService
     private function storeActivity(
         StravaConnection $stravaConnection,
         array $activityData,
+        bool $isSummary,
         ?StravaRawActivity $existingActivity = null
     ): void {
         $rawActivity = $existingActivity ?? StravaRawActivity::make([
@@ -141,6 +142,7 @@ class StravaActivitiesService
         ]);
         $activity->fill([
             'strava_raw_activity_id' => $rawActivity->id,
+            'is_summary' => $isSummary,
             'name' => $activityData['name'],
             'description' => $activityData['description'] ?? null,
             'distance_meters' => $activityData['distance'],
