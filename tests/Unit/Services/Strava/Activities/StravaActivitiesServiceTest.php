@@ -88,6 +88,7 @@ class StravaActivitiesServiceTest extends TestCase
 
             $this->assertDatabaseHas('strava_activities', [
                 'strava_raw_activity_id' => $matchingRawActivity->id,
+                'is_summary' => true,
                 'name' => $response['name'],
                 'description' => $response['description'],
                 'distance_meters' => $response['distance'],
@@ -389,6 +390,7 @@ class StravaActivitiesServiceTest extends TestCase
 
         $this->assertDatabaseHas('strava_activities', [
             'strava_raw_activity_id' => $matchingRawActivity->id,
+            'is_summary' => false,
             'name' => $activityJson['name'],
             'description' => $activityJson['description'],
             'distance_meters' => $activityJson['distance'],
@@ -531,6 +533,7 @@ class StravaActivitiesServiceTest extends TestCase
         $this->assertDatabaseHas('strava_activities', [
             'id' => $existingActivity->id,
             'strava_raw_activity_id' => $matchingRawActivity->id,
+            'is_summary' => false,
             'name' => $newActivityJson['name'],
             'description' => $newActivityJson['description'],
             'distance_meters' => $newActivityJson['distance'],

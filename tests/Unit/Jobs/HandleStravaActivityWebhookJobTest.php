@@ -80,7 +80,7 @@ class HandleStravaActivityWebhookJobTest extends TestCase
     public function test_handle_delete_activity_webhook(): void
     {
         Event::fake();
-        
+
         $stravaConnection = StravaConnection::factory()->create([
             'user_id' => User::factory()->create()->id,
             'athlete_id' => 123,

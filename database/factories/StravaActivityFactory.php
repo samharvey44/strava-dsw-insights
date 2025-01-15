@@ -12,6 +12,7 @@ class StravaActivityFactory extends Factory
     public function definition(): array
     {
         return [
+            'is_summary' => $this->faker->boolean(),
             'name' => $this->faker->name(),
             'description' => $this->faker->sentence(),
             'distance_meters' => $this->faker->randomFloat(2, 0, 10000),
