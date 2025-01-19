@@ -21,7 +21,16 @@
             @forelse($activities as $activity)
                 <div class="card mb-3">
                     <p class="card-header">
-                        <span class="fs-5 fw-bolder">{{ $activity->name }}</span><br/>
+                        <span class="fs-5 fw-bolder">
+                            {{ $activity->name }}
+                        </span>
+                        @if($activity->dswAnalysis)
+                            <br class="d-md-none" />
+                            <span class="badge bg-{{ $activity->dswAnalysis->dswType->typeGroup->display_class }} float-md-end">
+                                {{ $activity->dswAnalysis->dswType->name }}
+                            </span>
+                        @endif
+                        <br/>
                         {{ $activity->started_at->setTimezone($activity->timezone)->format('d/m/Y \a\t H:i') }}
                     </p>
 
