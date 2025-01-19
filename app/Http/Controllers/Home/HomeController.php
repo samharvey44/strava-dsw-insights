@@ -12,7 +12,7 @@ class HomeController extends Controller
     public function index(Request $request): View
     {
         $activities = StravaActivity::byUser(auth()->user())
-            ->with('dswAnalysis')
+            ->with('dswAnalysis.dswType.typeGroup')
             ->latest('started_at')
             ->paginate(20);
 

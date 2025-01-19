@@ -74,6 +74,13 @@ class StravaActivityDswAnalysisService
             $scoreMultiplier = 0;
         }
 
+        if (
+            (float) $scoreMultiplier === 0.0
+            || (float) $stravaActivity->average_speed_meters_per_second === 0.0
+        ) {
+            return 0;
+        }
+
         return round(($scoreMultiplier / $stravaActivity->average_speed_meters_per_second) * 100);
     }
 

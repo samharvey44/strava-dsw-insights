@@ -343,8 +343,8 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
     public function test_calculate_dsw_score_average_watts_present(): void
     {
         $stravaActivity = StravaActivity::factory()->create([
-            'average_watts' => $averageWatts = rand(100, 1000),
-            'average_speed_meters_per_second' => $averageSpeed = fake()->randomFloat(),
+            'average_watts' => $averageWatts = fake()->randomFloat(2, 2, 10),
+            'average_speed_meters_per_second' => $averageSpeed = fake()->randomFloat(2, 2, 10),
             'strava_raw_activity_id' => StravaRawActivity::factory()->create([
                 'strava_connection_id' => StravaConnection::factory()->create([
                     'user_id' => User::factory()->create()->id,
@@ -366,8 +366,8 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
     {
         $stravaActivity = StravaActivity::factory()->create([
             'average_watts' => null,
-            'average_heartrate' => $averageHeartrate = rand(100, 200),
-            'average_speed_meters_per_second' => $averageSpeed = fake()->randomFloat(),
+            'average_heartrate' => $averageHeartrate = fake()->randomFloat(2, 2, 10),
+            'average_speed_meters_per_second' => $averageSpeed = fake()->randomFloat(2, 2, 10),
             'strava_raw_activity_id' => StravaRawActivity::factory()->create([
                 'strava_connection_id' => StravaConnection::factory()->create([
                     'user_id' => User::factory()->create()->id,
@@ -390,7 +390,27 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
         $stravaActivity = StravaActivity::factory()->create([
             'average_watts' => null,
             'average_heartrate' => null,
-            'average_speed_meters_per_second' => fake()->randomFloat(),
+            'average_speed_meters_per_second' => fake()->randomFloat(2, 2, 10),
+            'strava_raw_activity_id' => StravaRawActivity::factory()->create([
+                'strava_connection_id' => StravaConnection::factory()->create([
+                    'user_id' => User::factory()->create()->id,
+                ])->id,
+            ])->id,
+        ]);
+
+        $dswScore = app(StravaActivityDswAnalysisService::class)->calculateDswScore(
+            $stravaActivity
+        );
+
+        $this->assertSame(0, $dswScore);
+    }
+
+    public function test_calculate_dsw_score_no_average_metres_per_second(): void
+    {
+        $stravaActivity = StravaActivity::factory()->create([
+            'average_watts' => fake()->randomFloat(2, 2, 10),
+            'average_heartrate' => fake()->randomFloat(2, 2, 10),
+            'average_speed_meters_per_second' => 0.0,
             'strava_raw_activity_id' => StravaRawActivity::factory()->create([
                 'strava_connection_id' => StravaConnection::factory()->create([
                     'user_id' => User::factory()->create()->id,
