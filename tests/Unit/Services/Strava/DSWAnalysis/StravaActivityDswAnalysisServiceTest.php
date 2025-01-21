@@ -567,7 +567,7 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
         $this->assertSame((int) round($expectedScore * 100), $dswScore);
     }
 
-    public function test_is_re_analysable_valid_dsw_type_is_summary(): void
+    public function test_is_re_analysable_is_summary_no_analysis(): void
     {
         $dswType = DswType::factory()->create([
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
@@ -582,20 +582,9 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
             ])->id,
         ]);
 
-        StravaActivityDswAnalysis::factory()->create([
-            'strava_activity_id' => $stravaActivity->id,
-            'dsw_type_id' => $dswType->id,
-        ]);
-
         $mockedService = Mockery::mock(StravaActivityDswAnalysisService::class)->makePartial();
 
-        $mockedService->shouldReceive('determineDswType')
-            ->once()
-            ->with(
-                Mockery::on(fn ($stravaActivityArg) => $stravaActivityArg->is($stravaActivity)),
-                Mockery::on(fn ($allDswTypesArg) => $allDswTypesArg->contains($dswType) && $allDswTypesArg->count() === 1),
-            )
-            ->andReturn($dswType);
+        $mockedService->shouldNotReceive('determineDswType');
 
         app()->instance(StravaActivityDswAnalysisService::class, $mockedService);
 
@@ -642,14 +631,14 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
         $this->assertTrue($isReAnalysable);
     }
 
-    public function test_is_re_analysable_invalid_dsw_type(): void
+    public function test_is_re_analysable_not_summary_invalid_dsw_type_no_analysis(): void
     {
         $dswType = DswType::factory()->create([
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
         ]);
 
         $stravaActivity = StravaActivity::factory()->create([
-            'is_summary' => true,
+            'is_summary' => false,
             'strava_raw_activity_id' => StravaRawActivity::factory()->create([
                 'strava_connection_id' => StravaConnection::factory()->create([
                     'user_id' => User::factory()->create()->id,
@@ -666,6 +655,80 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
                 Mockery::on(fn ($allDswTypesArg) => $allDswTypesArg->contains($dswType) && $allDswTypesArg->count() === 1),
             )
             ->andReturnNull();
+
+        app()->instance(StravaActivityDswAnalysisService::class, $mockedService);
+
+        $isReAnalysable = app(StravaActivityDswAnalysisService::class)->isReAnalysable(
+            $stravaActivity,
+            DswType::all(),
+        );
+
+        $this->assertFalse($isReAnalysable);
+    }
+
+    public function test_is_re_analysable_is_summary_has_analysis(): void
+    {
+        $dswType = DswType::factory()->create([
+            'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
+        ]);
+
+        $stravaActivity = StravaActivity::factory()->create([
+            'is_summary' => true,
+            'strava_raw_activity_id' => StravaRawActivity::factory()->create([
+                'strava_connection_id' => StravaConnection::factory()->create([
+                    'user_id' => User::factory()->create()->id,
+                ])->id,
+            ])->id,
+        ]);
+
+        StravaActivityDswAnalysis::factory()->create([
+            'dsw_type_id' => $dswType->id,
+            'strava_activity_id' => $stravaActivity->id,
+        ]);
+
+        $mockedService = Mockery::mock(StravaActivityDswAnalysisService::class)->makePartial();
+
+        $mockedService->shouldNotReceive('determineDswType');
+
+        app()->instance(StravaActivityDswAnalysisService::class, $mockedService);
+
+        $isReAnalysable = app(StravaActivityDswAnalysisService::class)->isReAnalysable(
+            $stravaActivity,
+            DswType::all(),
+        );
+
+        $this->assertFalse($isReAnalysable);
+    }
+
+    public function test_is_re_analysable_valid_dsw_type_has_analysis(): void
+    {
+        $dswType = DswType::factory()->create([
+            'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
+        ]);
+
+        $stravaActivity = StravaActivity::factory()->create([
+            'is_summary' => false,
+            'strava_raw_activity_id' => StravaRawActivity::factory()->create([
+                'strava_connection_id' => StravaConnection::factory()->create([
+                    'user_id' => User::factory()->create()->id,
+                ])->id,
+            ])->id,
+        ]);
+
+        StravaActivityDswAnalysis::factory()->create([
+            'dsw_type_id' => $dswType->id,
+            'strava_activity_id' => $stravaActivity->id,
+        ]);
+
+        $mockedService = Mockery::mock(StravaActivityDswAnalysisService::class)->makePartial();
+
+        $mockedService->shouldReceive('determineDswType')
+            ->once()
+            ->with(
+                Mockery::on(fn ($stravaActivityArg) => $stravaActivityArg->is($stravaActivity)),
+                Mockery::on(fn ($allDswTypesArg) => $allDswTypesArg->contains($dswType) && $allDswTypesArg->count() === 1),
+            )
+            ->andReturn($dswType);
 
         app()->instance(StravaActivityDswAnalysisService::class, $mockedService);
 

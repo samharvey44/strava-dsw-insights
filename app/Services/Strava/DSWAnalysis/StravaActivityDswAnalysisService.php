@@ -44,7 +44,7 @@ class StravaActivityDswAnalysisService
             // Attempt to pull the DSW type from the activity description instead.
             return $allDswTypes->first(
                 fn (DswType $dswType) => preg_match(
-                    "/\b{$dswType->name}\b/i",
+                    "/\bGarmin DSW - {$dswType->name}\b/i",
                     $stravaActivity->description ?? ''
                 )
             );
@@ -102,7 +102,7 @@ class StravaActivityDswAnalysisService
 
     public function isReAnalysable(StravaActivity $stravaActivity, Collection $allDswTypes): bool
     {
-        return $this->determineDswType($stravaActivity, $allDswTypes)
-            && ($stravaActivity->is_summary || is_null($stravaActivity->dswAnalysis));
+        return ($stravaActivity->is_summary || $this->determineDswType($stravaActivity, $allDswTypes))
+            && is_null($stravaActivity->dswAnalysis);
     }
 }

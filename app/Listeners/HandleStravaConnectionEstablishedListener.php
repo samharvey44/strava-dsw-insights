@@ -36,7 +36,7 @@ class HandleStravaConnectionEstablishedListener implements ShouldQueue
                 $event->stravaConnection,
                 self::ANALYSIS_BATCH_SIZE,
                 $analysisBatch * self::ANALYSIS_BATCH_SIZE,
-            );
+            )->delay(now()->addMinutes($analysisBatch));
         }
     }
 }

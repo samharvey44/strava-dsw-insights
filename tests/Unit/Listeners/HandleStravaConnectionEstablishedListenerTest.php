@@ -78,6 +78,8 @@ class HandleStravaConnectionEstablishedListenerTest extends TestCase
     {
         Queue::fake();
 
+        $this->freezeSecond();
+
         $stravaConnection = StravaConnection::factory()->create([
             'user_id' => User::factory()->create()->id,
         ]);
@@ -111,7 +113,8 @@ class HandleStravaConnectionEstablishedListenerTest extends TestCase
             function (AnalyzeStravaActivitiesBatchJob $job) use ($stravaConnection) {
                 return $job->stravaConnection->is($stravaConnection)
                     && $job->limit === 10
-                    && $job->offset === 0;
+                    && $job->offset === 0
+                    && $job->delay->toDateTimeString() === now()->toDateTimeString();
             }
         );
     }
@@ -160,6 +163,8 @@ class HandleStravaConnectionEstablishedListenerTest extends TestCase
     public function test_listener_dispatches_analysis_for_only_1000_activities(): void
     {
         Queue::fake();
+
+        $this->freezeSecond();
 
         $stravaConnection = StravaConnection::factory()->create([
             'user_id' => User::factory()->create()->id,
@@ -211,7 +216,8 @@ class HandleStravaConnectionEstablishedListenerTest extends TestCase
                 function (AnalyzeStravaActivitiesBatchJob $job) use ($stravaConnection, $analysisBatch) {
                     return $job->stravaConnection->is($stravaConnection)
                         && $job->limit === 10
-                        && $job->offset === $analysisBatch * 10;
+                        && $job->offset === $analysisBatch * 10
+                        && $job->delay->toDateTimeString() === now()->addMinutes($analysisBatch)->toDateTimeString();
                 }
             );
         }
