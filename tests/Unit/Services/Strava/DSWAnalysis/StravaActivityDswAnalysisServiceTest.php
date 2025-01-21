@@ -146,12 +146,12 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
     public function test_determine_dsw_type_invalid_type_in_name(): void
     {
         DswType::factory()->create([
-            'name' => fake()->word(),
+            'name' => fake()->unique()->word(),
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
         ]);
 
         $stravaActivity = StravaActivity::factory()->create([
-            'name' => 'Garmin DSW - '.fake()->word(),
+            'name' => 'Garmin DSW - '.fake()->unique()->word(),
             'strava_raw_activity_id' => StravaRawActivity::factory()->create([
                 'strava_connection_id' => StravaConnection::factory()->create([
                     'user_id' => User::factory()->create()->id,
@@ -172,12 +172,12 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
     public function test_determine_dsw_type_no_type_in_name(): void
     {
         DswType::factory()->create([
-            'name' => fake()->word(),
+            'name' => fake()->unique()->word(),
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
         ]);
 
         $stravaActivity = StravaActivity::factory()->create([
-            'name' => fake()->word(),
+            'name' => fake()->unique()->word(),
             'strava_raw_activity_id' => StravaRawActivity::factory()->create([
                 'strava_connection_id' => StravaConnection::factory()->create([
                     'user_id' => User::factory()->create()->id,
@@ -226,12 +226,12 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
     public function test_determine_dsw_type_invalid_type_in_description(): void
     {
         DswType::factory()->create([
-            'name' => fake()->word(),
+            'name' => fake()->unique()->word(),
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
         ]);
 
         $stravaActivity = StravaActivity::factory()->create([
-            'description' => 'Garmin DSW - '.fake()->word(),
+            'description' => 'Garmin DSW - '.fake()->unique()->word(),
             'strava_raw_activity_id' => StravaRawActivity::factory()->create([
                 'strava_connection_id' => StravaConnection::factory()->create([
                     'user_id' => User::factory()->create()->id,
@@ -252,12 +252,12 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
     public function test_determine_dsw_type_no_type_in_description(): void
     {
         DswType::factory()->create([
-            'name' => fake()->word(),
+            'name' => fake()->unique()->word(),
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
         ]);
 
         $stravaActivity = StravaActivity::factory()->create([
-            'description' => fake()->word(),
+            'description' => fake()->unique()->word(),
             'strava_raw_activity_id' => StravaRawActivity::factory()->create([
                 'strava_connection_id' => StravaConnection::factory()->create([
                     'user_id' => User::factory()->create()->id,
@@ -277,14 +277,14 @@ class StravaActivityDswAnalysisServiceTest extends TestCase
 
     public function test_determine_dsw_type_type_in_name_and_description(): void
     {
-        $dswTypeName = fake()->word();
+        $dswTypeName = fake()->unique()->word();
 
         $dswType = DswType::factory()->create([
             'name' => $dswTypeName,
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
         ]);
         $otherDswType = DswType::factory()->create([
-            'name' => fake()->word(),
+            'name' => fake()->unique()->word(),
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
         ]);
 
