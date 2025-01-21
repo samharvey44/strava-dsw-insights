@@ -37,7 +37,7 @@ class StravaActivityDswAnalysisService
     {
         // See if we can find a DSW type from the activity title.
         $dswTypeInTitle = trim(
-            explode('Garmin DSW - ', $stravaActivity->name)[1] ?? ''
+            explode(strtolower('Garmin DSW - '), strtolower($stravaActivity->name))[1] ?? ''
         );
 
         if ($dswTypeInTitle === '') {
@@ -57,17 +57,17 @@ class StravaActivityDswAnalysisService
 
     public function determineIsIntervals(StravaActivity $stravaActivity, DswType $dswType): bool
     {
-        return str_contains(
-            strtolower($stravaActivity->description ?? ''),
-            'recover',
+        return preg_match(
+            '/\brecover\b/i',
+            $stravaActivity->description ?? ''
         ) && $dswType->typeGroup->has_intervals;
     }
 
     public function determineIsTreadmill(StravaActivity $stravaActivity): bool
     {
-        return str_contains(
-            strtolower($stravaActivity->description ?? ''),
-            'treadmill',
+        return preg_match(
+            '/\btreadmill\b/i',
+            $stravaActivity->description ?? ''
         );
     }
 
@@ -78,7 +78,7 @@ class StravaActivityDswAnalysisService
         }
 
         // Apply power multiplier, higher score for higher power.
-        $scoreWithPowerMultiplier = $stravaActivity->average_speed_meters_per_second * ($stravaActivity->average_watts ?? 1);
+        $scoreWithPowerMultiplier = $stravaActivity->average_speed_meters_per_second * ($stravaActivity->average_watts ?: 1);
 
         // Penalise higher heart rates.
         $heartRateScorePenalty = $stravaActivity->average_heartrate
