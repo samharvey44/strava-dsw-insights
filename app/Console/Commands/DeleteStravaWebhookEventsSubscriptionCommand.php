@@ -6,7 +6,7 @@ use App\Models\StravaWebhookSubscription;
 use App\Services\Strava\Webhooks\StravaWebhooksService;
 use Illuminate\Console\Command;
 
-class DeleteStravaWebhookEventsSubscription extends Command
+class DeleteStravaWebhookEventsSubscriptionCommand extends Command
 {
     protected $signature = 'strava:delete-webhook-events-subscription';
 

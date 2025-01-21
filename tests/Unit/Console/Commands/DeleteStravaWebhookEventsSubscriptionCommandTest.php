@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
 
-class DeleteStravaWebhookEventsSubscriptionTest extends TestCase
+class DeleteStravaWebhookEventsSubscriptionCommandTest extends TestCase
 {
     use RefreshDatabase;
 
