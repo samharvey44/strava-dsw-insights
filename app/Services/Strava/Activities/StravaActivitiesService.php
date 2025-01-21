@@ -148,7 +148,7 @@ class StravaActivitiesService
             'distance_meters' => $activityData['distance'],
             'moving_time_seconds' => $activityData['moving_time'],
             'elapsed_time_seconds' => $activityData['elapsed_time'],
-            'elevation_gain_meters' => $activityData['total_elevation_gain'],
+            'elevation_gain_meters' => $activityData['total_elevation_gain'] ?? null,
             'started_at' => Carbon::parse($activityData['start_date']),
             'timezone' => explode(' ', $activityData['timezone'])[1],
             'summary_polyline' => ($activityData['map']['summary_polyline'] ?? null) ?: null,

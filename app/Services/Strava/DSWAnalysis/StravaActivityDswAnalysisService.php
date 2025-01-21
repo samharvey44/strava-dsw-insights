@@ -35,16 +35,23 @@ class StravaActivityDswAnalysisService
 
     public function determineDswType(StravaActivity $stravaActivity, Collection $allDswTypes): ?DswType
     {
-        $dswTypeFromActivityTitle = trim(
+        // See if we can find a DSW type from the activity title.
+        $dswTypeInTitle = trim(
             explode('Garmin DSW - ', $stravaActivity->name)[1] ?? ''
         );
 
-        if ($dswTypeFromActivityTitle === '') {
-            return null;
+        if ($dswTypeInTitle === '') {
+            // Attempt to pull the DSW type from the activity description instead.
+            return $allDswTypes->first(
+                fn (DswType $dswType) => preg_match(
+                    "/\b{$dswType->name}\b/i",
+                    $stravaActivity->description ?? ''
+                )
+            );
         }
 
         return $allDswTypes->first(
-            fn (DswType $dswType) => $dswType->name === $dswTypeFromActivityTitle,
+            fn (DswType $dswType) => strtolower($dswType->name) === strtolower($dswTypeInTitle),
         );
     }
 
@@ -66,22 +73,31 @@ class StravaActivityDswAnalysisService
 
     public function calculateDswScore(StravaActivity $stravaActivity): int
     {
-        $scoreMultiplier = ! empty($stravaActivity->average_watts)
-            ? $stravaActivity->average_watts
-            : $stravaActivity->average_heartrate;
-
-        if (is_null($scoreMultiplier)) {
-            $scoreMultiplier = 0;
-        }
-
-        if (
-            (float) $scoreMultiplier === 0.0
-            || (float) $stravaActivity->average_speed_meters_per_second === 0.0
-        ) {
+        if (is_null($stravaActivity->average_watts) && is_null($stravaActivity->average_heartrate)) {
             return 0;
         }
 
-        return round(($scoreMultiplier / $stravaActivity->average_speed_meters_per_second) * 100);
+        // Apply power multiplier, higher score for higher power.
+        $scoreWithPowerMultiplier = $stravaActivity->average_speed_meters_per_second * ($stravaActivity->average_watts ?? 1);
+
+        // Penalise higher heart rates.
+        $heartRateScorePenalty = $stravaActivity->average_heartrate
+            ? $stravaActivity->average_heartrate / 200 // Assume 200 as max HR for the purposes of score calculation
+            : 0;
+
+        // Apply the penalty to the score initially calculated with the power multiplier.
+        $scoreWithPowerMultiplierAndHeartRatePenalty = $scoreWithPowerMultiplier * (1 - $heartRateScorePenalty);
+
+        if ($stravaActivity->elevation_gain_meters > 0) {
+            // Apply a bonus for elevation gain.
+            $scoreWithPowerMultiplierAndHeartRatePenalty *= (1 + ($stravaActivity->elevation_gain_meters / 1000));
+        }
+
+        return max(
+            // Apply multiplier to final score to increase granularity.
+            (int) round($scoreWithPowerMultiplierAndHeartRatePenalty * 100),
+            0
+        );
     }
 
     public function isReAnalysable(StravaActivity $stravaActivity, Collection $allDswTypes): bool

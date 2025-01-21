@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('distance_meters', 10);
             $table->unsignedInteger('moving_time_seconds');
             $table->unsignedInteger('elapsed_time_seconds');
-            $table->decimal('elevation_gain_meters', 10);
+            $table->decimal('elevation_gain_meters', 10)->nullable();
             $table->dateTime('started_at')->index();
             $table->string('timezone');
             $table->text('summary_polyline')->nullable();
