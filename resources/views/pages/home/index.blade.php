@@ -26,9 +26,32 @@
                         </span>
                         @if($activity->dswAnalysis)
                             <br class="d-md-none" />
+
+                            @if($activity->dswAnalysis->treadmill)
+                                <span class="badge bg-dark float-end d-md-block d-none ms-1">
+                                    Treadmill
+                                </span>
+                            @endif
+                            @if($activity->dswAnalysis->intervals)
+                                <span class="badge bg-danger float-end d-md-block d-none ms-1">
+                                    Intervals
+                                </span>
+                            @endif
+
                             <span class="badge bg-{{ $activity->dswAnalysis->dswType->typeGroup->display_class }} float-md-end">
                                 {{ $activity->dswAnalysis->dswType->name }}
                             </span>
+
+                            @if($activity->dswAnalysis->treadmill)
+                                <span class="badge bg-dark d-md-none">
+                                    Treadmill
+                                </span>
+                            @endif
+                            @if($activity->dswAnalysis->intervals)
+                                <span class="badge bg-danger d-md-none">
+                                    Intervals
+                                </span>
+                            @endif
                         @endif
                         <br/>
                         {{ $activity->started_at->setTimezone($activity->timezone)->format('d/m/Y \a\t H:i') }}
@@ -48,7 +71,7 @@
                                     <br/>
                                     <strong>Moving Time:</strong> {{ gmdate('H:i:s', $activity->moving_time_seconds) }}<br />
                                     <strong>Elapsed Time:</strong> {{ gmdate('H:i:s', $activity->elapsed_time_seconds) }}<br />
-                                    <strong>Elevation Gain:</strong> {{ number_format($activity->elevation_gain_meters, 2) }} m<br />
+                                    <strong>Elevation Gain:</strong> {{ number_format($activity->elevation_gain_meters ?? 0, 2) }} m<br />
                                     <br/>
                                     <strong>Avg. Pace:</strong> {{ gmdate('i:s', 1000 / $activity->average_speed_meters_per_second) }}/km<br />
                                     @if(!is_null($activity->average_heartrate))
@@ -56,6 +79,10 @@
                                     @endif
                                     @if(!is_null($activity->average_watts))
                                         <strong>Avg. Power:</strong> {{ number_format($activity->average_watts) }}W<br />
+                                    @endif
+                                    @if($activity->dswAnalysis)
+                                        <br/>
+                                        <strong>DSW Score:</strong> {{ number_format($activity->dswAnalysis->dsw_score) }}<br />
                                     @endif
                                 </p>
                             </div>

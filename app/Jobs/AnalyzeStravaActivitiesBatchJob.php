@@ -28,13 +28,14 @@ class AnalyzeStravaActivitiesBatchJob extends Job
                     $query->select('id', 'strava_activity_id');
                 },
             ])
-            ->orderBy('id')
+            ->orderBy('strava_activities.id')
             ->limit($this->limit)
             ->offset($this->offset)
             ->get();
+        $allDswTypes = DswType::all();
 
-        $activitiesForBatch->each(function (StravaActivity $stravaActivity) use ($analysisService, $activitiesService) {
-            if (! $analysisService->isReAnalysable($stravaActivity, DswType::all())) {
+        $activitiesForBatch->each(function (StravaActivity $stravaActivity) use ($analysisService, $activitiesService, $allDswTypes) {
+            if (! $analysisService->isReAnalysable($stravaActivity, $allDswTypes)) {
                 return;
             }
 
