@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Services\Strava\Webhooks\StravaWebhooksService;
 use Illuminate\Console\Command;
 
-class RegisterStravaWebhookEventsSubscription extends Command
+class RegisterStravaWebhookEventsSubscriptionCommand extends Command
 {
     protected $signature = 'strava:register-webhook-events-subscription';
 
