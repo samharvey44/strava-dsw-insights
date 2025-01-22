@@ -39,3 +39,5 @@ Route::prefix('/strava')->name('strava.')->group(function () {
         StravaWebhooksController::class
     )->name('webhook-updates');
 });
+
+Route::redirect('/', '/home');
