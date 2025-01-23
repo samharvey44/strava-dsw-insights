@@ -5,6 +5,9 @@ namespace Deployer;
 require 'recipe/laravel.php';
 require 'contrib/npm.php';
 
+require_once __DIR__ . '/vendor/autoload.php';
+\Dotenv\Dotenv::createImmutable(__DIR__)->load();
+
 // Config
 
 set('repository', 'https://github.com/samharvey44/strava-dsw-insights.git');
@@ -15,7 +18,7 @@ add('writable_dirs', []);
 
 // Hosts
 
-host('***REMOVED***')
+host(env('DEPLOYMENT_IP'))
     ->set('remote_user', 'deployer')
     ->set('deploy_path', '~/strava-dsw-insights');
 
