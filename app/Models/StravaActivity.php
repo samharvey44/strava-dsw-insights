@@ -44,8 +44,10 @@ class StravaActivity extends Model
 
     public function scopeByUser(Builder $query, User $user): void
     {
-        $query->whereHas('rawActivity', function (Builder $query) use ($user) {
-            $query->where('strava_connection_id', $user->stravaConnection?->id);
+        $query->where(function (Builder $query) use ($user) {
+            $query->whereHas('rawActivity', function (Builder $query) use ($user) {
+                $query->where('strava_connection_id', $user->stravaConnection?->id);
+            });
         });
     }
 

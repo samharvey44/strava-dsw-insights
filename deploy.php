@@ -1,4 +1,5 @@
 <?php
+
 namespace Deployer;
 
 require 'recipe/laravel.php';
@@ -22,7 +23,7 @@ host('178.62.17.94')
 
 desc('Build static assets');
 task('npm:build', function () {
-    run("cd {{release_path}} && {{bin/npm}} run build");
+    run('cd {{release_path}} && {{bin/npm}} run build');
 });
 
 // Hooks

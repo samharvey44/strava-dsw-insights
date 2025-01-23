@@ -3,15 +3,15 @@
 namespace App\Listeners;
 
 use App\Events\StravaConnectionEstablishedEvent;
-use App\Jobs\AnalyzeStravaActivitiesBatchJob;
+use App\Jobs\AnalyzeStravaActivityJob;
 use App\Models\StravaActivity;
 use App\Services\Strava\Activities\StravaActivitiesService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class HandleStravaConnectionEstablishedListener implements ShouldQueue
 {
-    private const int ANALYSIS_BATCH_SIZE = 10;
-
     public function handle(StravaConnectionEstablishedEvent $event): void
     {
         $stravaActivitiesService = app(StravaActivitiesService::class);
@@ -22,21 +22,19 @@ class HandleStravaConnectionEstablishedListener implements ShouldQueue
 
         $stravaActivitiesService->fetchActivities($event->stravaConnection);
 
-        $numberOfUnanalysedActivities = StravaActivity::byUser($event->stravaConnection->user)
-            ->whereDoesntHave('dswAnalysis')
-            ->count();
-        $batchesToAnalyse = (int) ceil($numberOfUnanalysedActivities / self::ANALYSIS_BATCH_SIZE);
+        $delaySeconds = 0;
 
-        if ($batchesToAnalyse === 0) {
-            return;
-        }
+        StravaActivity::byUser($event->stravaConnection->user)
+            ->where(fn (Builder $query) => $query->whereDoesntHave('dswAnalysis'))
+            ->limit(1000)
+            ->chunkById(100, function (Collection $activities) use (&$delaySeconds) {
+                $activities->each(function (StravaActivity $activity) use (&$delaySeconds) {
+                    $delayUntil = now()->addSeconds($delaySeconds);
 
-        foreach (range(0, min($batchesToAnalyse, 99)) as $analysisBatch) {
-            AnalyzeStravaActivitiesBatchJob::dispatch(
-                $event->stravaConnection,
-                self::ANALYSIS_BATCH_SIZE,
-                $analysisBatch * self::ANALYSIS_BATCH_SIZE,
-            )->delay(now()->addMinutes($analysisBatch));
-        }
+                    AnalyzeStravaActivityJob::dispatch($activity)->delay($delayUntil);
+
+                    $delaySeconds += 5;
+                });
+            });
     }
 }
