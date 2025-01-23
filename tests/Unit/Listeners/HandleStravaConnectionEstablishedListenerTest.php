@@ -3,7 +3,7 @@
 namespace Tests\Unit\Listeners;
 
 use App\Events\StravaConnectionEstablishedEvent;
-use App\Jobs\AnalyzeStravaActivitiesBatchJob;
+use App\Jobs\AnalyzeStravaActivityJob;
 use App\Listeners\HandleStravaConnectionEstablishedListener;
 use App\Models\DswType;
 use App\Models\DswTypeGroup;
@@ -84,7 +84,7 @@ class HandleStravaConnectionEstablishedListenerTest extends TestCase
             'user_id' => User::factory()->create()->id,
         ]);
 
-        StravaActivity::factory()->create([
+        $stravaActivity = StravaActivity::factory()->create([
             'strava_raw_activity_id' => StravaRawActivity::factory()->create([
                 'strava_connection_id' => $stravaConnection->id,
             ])->id,
@@ -109,11 +109,9 @@ class HandleStravaConnectionEstablishedListenerTest extends TestCase
         $listener->handle($event);
 
         Queue::assertPushed(
-            AnalyzeStravaActivitiesBatchJob::class,
-            function (AnalyzeStravaActivitiesBatchJob $job) use ($stravaConnection) {
-                return $job->stravaConnection->is($stravaConnection)
-                    && $job->limit === 10
-                    && $job->offset === 0
+            AnalyzeStravaActivityJob::class,
+            function (AnalyzeStravaActivityJob $job) use ($stravaActivity) {
+                return $job->stravaActivity->is($stravaActivity)
                     && $job->delay->toDateTimeString() === now()->toDateTimeString();
             }
         );
@@ -170,12 +168,14 @@ class HandleStravaConnectionEstablishedListenerTest extends TestCase
             'user_id' => User::factory()->create()->id,
         ]);
 
+        $createdActivities = [];
+
         foreach (range(1, 1000) as $i) {
             $rawActivity = StravaRawActivity::factory()->create([
                 'strava_connection_id' => $stravaConnection->id,
             ]);
 
-            StravaActivity::factory()->create([
+            $createdActivities[$i] = StravaActivity::factory()->create([
                 'strava_raw_activity_id' => $rawActivity->id,
             ]);
         }
@@ -210,24 +210,20 @@ class HandleStravaConnectionEstablishedListenerTest extends TestCase
 
         $listener->handle($event);
 
-        foreach (range(0, 99) as $analysisBatch) {
+        foreach (range(1, 1000) as $activityIndexToAnalyse) {
             Queue::assertPushed(
-                AnalyzeStravaActivitiesBatchJob::class,
-                function (AnalyzeStravaActivitiesBatchJob $job) use ($stravaConnection, $analysisBatch) {
-                    return $job->stravaConnection->is($stravaConnection)
-                        && $job->limit === 10
-                        && $job->offset === $analysisBatch * 10
-                        && $job->delay->toDateTimeString() === now()->addMinutes($analysisBatch)->toDateTimeString();
+                AnalyzeStravaActivityJob::class,
+                function (AnalyzeStravaActivityJob $job) use ($createdActivities, $activityIndexToAnalyse) {
+                    return $job->stravaActivity->is($createdActivities[$activityIndexToAnalyse])
+                        && $job->delay->toDateTimeString() === now()->addSeconds(($activityIndexToAnalyse - 1) * 5)->toDateTimeString();
                 }
             );
         }
 
         Queue::assertNotPushed(
-            AnalyzeStravaActivitiesBatchJob::class,
-            function (AnalyzeStravaActivitiesBatchJob $job) use ($stravaConnection) {
-                return $job->stravaConnection->is($stravaConnection)
-                    && $job->limit === 10
-                    && $job->offset === 1000;
+            AnalyzeStravaActivityJob::class,
+            function (AnalyzeStravaActivityJob $job) use ($analysedActivity) {
+                return $job->stravaActivity->is($analysedActivity);
             }
         );
     }
