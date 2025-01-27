@@ -47,7 +47,7 @@ jobs:
 
     - name: Install Node.js Dependencies
       run: |
-        npm install
+        npm ci
         npm run build
 
     - name: Wait for MySQL to be ready
