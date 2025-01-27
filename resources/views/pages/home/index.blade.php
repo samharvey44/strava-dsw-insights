@@ -1,3 +1,6 @@
+@use(App\Services\Strava\DSWAnalysis\StravaActivityDswAnalysisScoringService)
+@use(App\Services\Strava\StravaActivityDswAnalysisScoreBandEnum)
+
 <x-app page-title="Home">
     <div class="pt-3">
         @if(!auth()->user()->hasActiveStravaConnection())
@@ -82,7 +85,45 @@
                                     @endif
                                     @if($activity->dswAnalysis)
                                         <br/>
-                                        <strong>DSW Score:</strong> {{ number_format($activity->dswAnalysis->dsw_score) }}<br />
+                                        <strong>DSW Score:</strong>
+                                        @switch(app(StravaActivityDswAnalysisScoringService::class)->getActivityScoreBand($activity))
+                                            @case(StravaActivityDswAnalysisScoreBandEnum::BAND_1)
+                                                <span class="badge bg-danger" data-bs-title="Low score" data-bs-toggle="tooltip">
+                                                    {{ number_format($activity->dswAnalysis->dsw_score) }}
+                                                </span>
+                                                @break
+                                            @case(StravaActivityDswAnalysisScoreBandEnum::BAND_2)
+                                                <span class="badge bg-warning" data-bs-title="Average score" data-bs-toggle="tooltip">
+                                                    {{ number_format($activity->dswAnalysis->dsw_score) }}
+                                                </span>
+                                                @break
+                                            @case(StravaActivityDswAnalysisScoreBandEnum::BAND_3)
+                                                <span class="badge bg-success" data-bs-title="Good score" data-bs-toggle="tooltip">
+                                                    {{ number_format($activity->dswAnalysis->dsw_score) }}
+                                                </span>
+                                                @break
+                                            @case(StravaActivityDswAnalysisScoreBandEnum::MISSING_HEARTRATE)
+                                                <span class="badge bg-dark-subtle" data-bs-title="Missing heart rate data" data-bs-toggle="tooltip">
+                                                    {{ number_format($activity->dswAnalysis->dsw_score) }}
+                                                </span>
+                                                @break
+                                            @case(StravaActivityDswAnalysisScoreBandEnum::MISSING_POWER)
+                                                <span class="badge bg-dark-subtle" data-bs-title="Missing power data" data-bs-toggle="tooltip">
+                                                    {{ number_format($activity->dswAnalysis->dsw_score) }}
+                                                </span>
+                                                @break
+                                            @case(StravaActivityDswAnalysisScoreBandEnum::MISSING_ANALYSIS)
+                                                <span class="badge bg-dark-subtle" data-bs-title="Activity not analysed" data-bs-toggle="tooltip">
+                                                    {{ number_format($activity->dswAnalysis->dsw_score) }}
+                                                </span>
+                                                @break
+                                            @case(StravaActivityDswAnalysisScoreBandEnum::NOT_ENOUGH_DATA)
+                                                <span class="badge bg-dark-subtle" data-bs-title="Not enough data for DSW Type" data-bs-toggle="tooltip">
+                                                    {{ number_format($activity->dswAnalysis->dsw_score) }}
+                                                </span>
+                                                @break
+                                        @endswitch
+                                        <br />
                                     @endif
                                 </p>
                             </div>
