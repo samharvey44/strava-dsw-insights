@@ -3,7 +3,9 @@
 namespace Deployer;
 
 require 'recipe/laravel.php';
+
 require 'contrib/npm.php';
+require 'contrib/cachetool.php';
 
 require_once __DIR__.'/vendor/autoload.php';
 \Dotenv\Dotenv::createImmutable(__DIR__)->load();
@@ -34,6 +36,7 @@ task('npm:build', function () {
 after('deploy:update_code', 'npm:install');
 after('npm:install', 'npm:build');
 
-after('deploy:symlink', 'artisan:queue:restart');
+after('deploy:symlink', 'cachetool:clear:opcache');
+after('cachetool:clear:opcache', 'artisan:queue:restart');
 
 after('deploy:failed', 'deploy:unlock');
