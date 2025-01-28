@@ -11,8 +11,10 @@ use Illuminate\Support\Collection;
 
 class StravaActivityDswAnalysisScoringService
 {
-    public function getActivityScoreBand(StravaActivity $activity): StravaActivityDswAnalysisScoreBandEnum
-    {
+    public function getActivityScoreBand(
+        StravaActivity $activity,
+        ?Collection $scoreBands = null,
+    ): StravaActivityDswAnalysisScoreBandEnum {
         if (is_null($activity->dswAnalysis)) {
             return StravaActivityDswAnalysisScoreBandEnum::MISSING_ANALYSIS;
         }
@@ -25,7 +27,7 @@ class StravaActivityDswAnalysisScoringService
             return StravaActivityDswAnalysisScoreBandEnum::MISSING_POWER;
         }
 
-        $scoreBands = $this->getScoreBandsByType($activity->rawActivity->stravaConnection);
+        $scoreBands ??= $this->getScoreBandsByType($activity->rawActivity->stravaConnection);
 
         $integerIntervals = (int) $activity->dswAnalysis->intervals;
         $scoreKey = "{$activity->dswAnalysis->dsw_type_id}:{$integerIntervals}";
@@ -84,6 +86,6 @@ class StravaActivityDswAnalysisScoringService
             ];
 
             return $carry;
-        }, new Collection);
+        }, collect());
     }
 }

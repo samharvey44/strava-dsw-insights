@@ -86,7 +86,7 @@
                                     @if($activity->dswAnalysis)
                                         <br/>
                                         <strong>DSW Score:</strong>
-                                        @switch(app(StravaActivityDswAnalysisScoringService::class)->getActivityScoreBand($activity))
+                                        @switch(app(StravaActivityDswAnalysisScoringService::class)->getActivityScoreBand($activity, $scoreBands))
                                             @case(StravaActivityDswAnalysisScoreBandEnum::BAND_1)
                                                 <span class="badge bg-danger" data-bs-title="Low score" data-bs-toggle="tooltip">
                                                     {{ number_format($activity->dswAnalysis->dsw_score) }}
