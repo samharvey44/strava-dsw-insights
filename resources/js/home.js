@@ -22,6 +22,8 @@ const applyFilterAndSortFromQueryParams = () => {
     const urlParams = new URLSearchParams(window.location.search);
 
     const filters = urlParams.entries().reduce((acc, [key, value]) => {
+        // Extract a filter from the query string.
+        // E.g. filters[foo]=bar => { foo: bar }
         const filterMatch = key.match(/^filters\[(.+)\]$/);
 
         if (filterMatch) {
