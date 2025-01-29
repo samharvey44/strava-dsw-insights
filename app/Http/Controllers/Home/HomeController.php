@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
 use App\Models\StravaActivity;
+use App\Services\DswTypes\DswTypesService;
 use App\Services\Strava\DSWAnalysis\StravaActivityDswAnalysisScoringService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -23,6 +24,11 @@ class HomeController extends Controller
             )
             : collect();
 
-        return view('pages.home.index', compact('activities', 'scoreBands'));
+        $dswTypes = app(DswTypesService::class)->getAllTypes();
+
+        return view(
+            'pages.home.index',
+            compact('activities', 'scoreBands', 'dswTypes')
+        );
     }
 }

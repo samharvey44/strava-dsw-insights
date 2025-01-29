@@ -19,6 +19,15 @@
             @if($activities->isNotEmpty())
                 <div class="d-flex align-items-center justify-content-center">
                     <div style="max-width: 800px" class="d-flex flex-column flex-grow-1">
+                        <div>
+                            <button class="btn btn-primary mb-3"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#activity_filters_modal"
+                            >
+                                <i class="bi bi-filter"></i>
+                                Filter Activities
+                            </button>
+                        </div>
             @endif
 
             @forelse($activities as $activity)
@@ -159,6 +168,79 @@
             @endif
 
             @if($activities->isNotEmpty())
+                        <div class="modal modal-lg fade" tabindex="-1" id="activity_filters_modal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Filter Activities</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <p class="fs-6 fst-italic">DSW Type</p>
+
+                                                @foreach($dswTypes->sortBy('typeGroup.id') as $dswType)
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" role="switch" id="filter_dsw_type_{{ $dswType->id }}">
+                                                        <label class="form-check-label" for="filter_dsw_type_{{ $dswType->id }}">
+                                                            <div class="d-flex">
+                                                                <div style="width: 100px;">
+                                                                    {{ $dswType->name }}
+                                                                </div>
+                                                                <div class="bg-{{ $dswType->typeGroup->display_class }} rounded-circle d-inline-block mt-2" style="width: 10px; height: 10px;"></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                            <hr class="d-lg-none d-block mt-lg-0 mt-3" />
+
+                                            <div class="col-lg-4">
+                                                <p class="fs-6 fst-italic">Meta</p>
+
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="filter_interval_activities">
+                                                    <label class="form-check-label" for="filter_interval_activities">Show Intervals</label>
+                                                </div>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="filter_non_interval_activities">
+                                                    <label class="form-check-label" for="filter_non_interval_activities">Show Non-Intervals</label>
+                                                </div>
+
+                                                <div class="form-check form-switch mt-3">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="filter_treadmill_activities">
+                                                    <label class="form-check-label" for="filter_treadmill_activities">Show Treadmill</label>
+                                                </div>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="filter_non_treadmill_activities">
+                                                    <label class="form-check-label" for="filter_non_treadmill_activities">Show Non-Treadmill</label>
+                                                </div>
+                                            </div>
+
+                                            <hr class="d-lg-none d-block mt-lg-0 mt-3" />
+
+                                            <div class="col-lg-4">
+                                                <p class="fs-6 fst-italic">Sorting</p>
+
+                                                <div class="d-flex align-items-center">
+                                                    <button class="btn btn-sm btn-light" id="sort_dsw_score">
+                                                        DSW Score
+                                                        <i class="bi bi-arrow-up filter-asc d-none"></i>
+                                                        <i class="bi bi-arrow-down filter-desc d-none"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary">Save Filters</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endif

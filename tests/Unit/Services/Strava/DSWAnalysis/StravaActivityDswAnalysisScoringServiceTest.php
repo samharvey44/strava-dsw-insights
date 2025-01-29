@@ -300,6 +300,7 @@ class StravaActivityDswAnalysisScoringServiceTest extends TestCase
 
         $this->assertEquals(StravaActivityDswAnalysisScoreBandEnum::BAND_1, $activityScoreBand);
     }
+
     public function test_get_activity_score_band_equal_to_band_1(): void
     {
         $stravaActivity = StravaActivity::factory()->create([
@@ -387,6 +388,7 @@ class StravaActivityDswAnalysisScoringServiceTest extends TestCase
 
         $this->assertEquals(StravaActivityDswAnalysisScoreBandEnum::BAND_2, $activityScoreBand);
     }
+
     public function test_get_activity_score_band_equal_to_band_2(): void
     {
         $stravaActivity = StravaActivity::factory()->create([
