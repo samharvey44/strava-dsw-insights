@@ -18,7 +18,7 @@ const insertPolylineMaps = () => {
     });
 }
 
-const applyFilterAndSortFromQueryParams = () => {
+const extractFilterAndSortFromQueryParams = () => {
     const urlParams = new URLSearchParams(window.location.search);
 
     const filters = urlParams.entries().reduce((acc, [key, value]) => {
@@ -44,7 +44,20 @@ const applyFilterAndSortFromQueryParams = () => {
     });
 }
 
+const addApplyFiltersListener = () => {
+    document.getElementById('apply_dsw_filters').addEventListener('click', () => {
+        const filterParams = new URLSearchParams();
+
+        document.querySelectorAll('#activity_filters_modal input[type="checkbox"][id^="filter_"]').forEach((element) => {
+            filterParams.append(`filters[${element.id.replace('filter_', '')}]`, element.checked ? '1' : '0');
+        });
+
+        window.location.search = filterParams.toString();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     insertPolylineMaps();
-    applyFilterAndSortFromQueryParams();
+    extractFilterAndSortFromQueryParams();
+    addApplyFiltersListener();
 });

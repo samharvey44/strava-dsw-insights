@@ -540,7 +540,7 @@ class StravaActivityDswAnalysisScoringServiceTest extends TestCase
 
         $this->assertEquals(
             collect(),
-            Cache::get("strava-activity-dsw-analysis-scoring-service:{$stravaConnection->id}:{$newestUpdatedAnalysis->updated_at->timestamp}"),
+            Cache::get("strava_activity_dsw_analysis_scoring_service:{$stravaConnection->id}:{$newestUpdatedAnalysis->updated_at->timestamp}"),
         );
     }
 
@@ -580,7 +580,7 @@ class StravaActivityDswAnalysisScoringServiceTest extends TestCase
 
         $this->assertEquals(
             collect(),
-            Cache::get("strava-activity-dsw-analysis-scoring-service:{$stravaConnection->id}:NULL"),
+            Cache::get("strava_activity_dsw_analysis_scoring_service:{$stravaConnection->id}:NULL"),
         );
     }
 
