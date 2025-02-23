@@ -15,8 +15,10 @@ class HomeController extends Controller
     public function index(Request $request): View
     {
         $activities = app(HomeFilteringService::class)->applyFiltersAndSort(
-            StravaActivity::byUser(auth()->user())->with('dswAnalysis.dswType.typeGroup')->latest('started_at'),
-            $request->all()['filters'] ?? []
+            StravaActivity::byUser(auth()->user())->with('dswAnalysis.dswType.typeGroup'),
+            $request->array('filters'),
+            $request->get('sort'),
+            $request->get('sort_direction')
         )->paginate(20);
 
         $scoreBands = auth()->user()->stravaConnection
@@ -27,7 +29,7 @@ class HomeController extends Controller
 
         $dswTypes = app(DswTypesService::class)->getAllTypes();
 
-        $filtersApplied = is_array($request->get('filters'));
+        $filtersApplied = !empty($request->array('filters'));
 
         return view(
             'pages.home.index',

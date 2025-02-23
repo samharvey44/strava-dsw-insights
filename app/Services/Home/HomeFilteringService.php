@@ -2,16 +2,22 @@
 
 namespace App\Services\Home;
 
+use App\Models\StravaActivityDswAnalysis;
 use Illuminate\Database\Eloquent\Builder;
 
 class HomeFilteringService
 {
-    public function applyFiltersAndSort(Builder $activitiesQuery, array $filters): Builder
-    {
+    public function applyFiltersAndSort(
+        Builder $activitiesQuery,
+        array $filters,
+        ?string $sort,
+        ?string $sortDirection
+    ): Builder {
         $activitiesQuery = $this->applyDswTypeFilters($activitiesQuery, $filters);
+        $activitiesQuery = $this->applyUnanalysedFilter($activitiesQuery, $filters);
         $activitiesQuery = $this->applyIntervalsFilters($activitiesQuery, $filters);
         $activitiesQuery = $this->applyTreadmillFilters($activitiesQuery, $filters);
-        $activitiesQuery = $this->applySort($activitiesQuery, $filters);
+        $activitiesQuery = $this->applySort($activitiesQuery, $sort, $sortDirection);
 
         return $activitiesQuery;
     }
@@ -58,6 +64,15 @@ class HomeFilteringService
         return $activitiesQuery;
     }
 
+    private function applyUnanalysedFilter(Builder $activitiesQuery, array $filters): Builder
+    {
+        if (! ($filters['unanalysed_activities'] ?? true)) {
+            return $activitiesQuery->whereHas('dswAnalysis');
+        }
+
+        return $activitiesQuery;
+    }
+
     private function applyIntervalsFilters(Builder $activitiesQuery, array $filters): Builder
     {
         $valuesToInclude = array_map(fn ($value) => (bool) $value, [
@@ -86,15 +101,24 @@ class HomeFilteringService
         return $activitiesQuery;
     }
 
-    private function applySort(Builder $activitiesQuery, array $filters): Builder
+    private function applySort(Builder $activitiesQuery, ?string $sort, ?string $sortDirection): Builder
     {
-        $sort = $filters['sort'] ?? 'started_at';
-        $direction = $filters['sort_direction'] ?? 'desc';
+        $sort = $sort ?? 'started_at';
+        $sortDirection = $sortDirection ?? 'desc';
 
         if (! in_array($sort, ['started_at', 'dsw_score'])) {
             return $activitiesQuery->orderBy('started_at', 'desc');
         }
 
-        return $activitiesQuery->orderBy($sort, $direction);
+        if ($sort === 'dsw_score') {
+            return $activitiesQuery->orderBy(
+                StravaActivityDswAnalysis::select('dsw_score')
+                    ->whereColumn('strava_activity_id', 'strava_activities.id')
+                    ->limit(1),
+                $sortDirection
+            );
+        }
+
+        return $activitiesQuery->orderBy($sort, $sortDirection);
     }
 }

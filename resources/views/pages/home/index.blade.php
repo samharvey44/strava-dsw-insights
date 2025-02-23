@@ -166,7 +166,7 @@
 
                 @if($activities->hasPages())
                     <div>
-                        {{ $activities->links() }}
+                        {{ $activities->withQueryString()->links() }}
                     </div>
                 @endif
 
@@ -203,6 +203,11 @@
                                         <p class="fs-6 fst-italic">Meta</p>
 
                                         <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="filter_unanalysed_activities">
+                                            <label class="form-check-label" for="filter_unanalysed_activities">Show Unanalysed Activities</label>
+                                        </div>
+
+                                        <div class="form-check form-switch mt-3">
                                             <input class="form-check-input" type="checkbox" role="switch" id="filter_interval_activities">
                                             <label class="form-check-label" for="filter_interval_activities">Show Intervals</label>
                                         </div>
@@ -229,8 +234,8 @@
                                         <div class="d-flex align-items-center">
                                             <button class="btn btn-sm btn-light" id="sort_dsw_score">
                                                 DSW Score
-                                                <i class="bi bi-arrow-up filter-asc d-none"></i>
-                                                <i class="bi bi-arrow-down filter-desc d-none"></i>
+                                                <i class="bi bi-arrow-up sort-asc d-none"></i>
+                                                <i class="bi bi-arrow-down sort-desc d-none"></i>
                                             </button>
                                         </div>
                                     </div>
