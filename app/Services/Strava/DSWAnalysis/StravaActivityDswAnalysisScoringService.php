@@ -55,7 +55,7 @@ class StravaActivityDswAnalysisScoringService
             ->first()?->max_last_updated ?? 'NULL';
 
         return Cache::remember(
-            "strava-activity-dsw-analysis-scoring-service:{$stravaConnection->id}:{$lastUpdatedDswAnalysis}",
+            "strava_activity_dsw_analysis_scoring_service:{$stravaConnection->id}:{$lastUpdatedDswAnalysis}",
             now()->addDay(),
             fn () => $this->getScoreBandsByTypeUncached($stravaConnection),
         );
