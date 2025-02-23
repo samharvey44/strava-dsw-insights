@@ -238,6 +238,13 @@
                                                 <i class="bi bi-arrow-down sort-desc d-none"></i>
                                             </button>
                                         </div>
+                                        <div class="d-flex align-items-center">
+                                            <button class="btn btn-sm btn-light mt-2" id="sort_distance_meters">
+                                                Distance
+                                                <i class="bi bi-arrow-up sort-asc d-none"></i>
+                                                <i class="bi bi-arrow-down sort-desc d-none"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -29,7 +29,7 @@ class HomeController extends Controller
 
         $dswTypes = app(DswTypesService::class)->getAllTypes();
 
-        $filtersApplied = !empty($request->array('filters'));
+        $filtersApplied = ! empty($request->array('filters'));
 
         return view(
             'pages.home.index',

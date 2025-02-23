@@ -26,8 +26,8 @@ class HomeFilteringService
     {
         $dswTypeFilters = array_filter(
             $filters,
-            fn (mixed $value, string $key) => str_starts_with($key, 'dsw_type_'),
-            ARRAY_FILTER_USE_BOTH
+            fn (string $key) => str_starts_with($key, 'dsw_type_'),
+            ARRAY_FILTER_USE_KEY
         );
 
         $typesToInclude = [];
@@ -36,7 +36,7 @@ class HomeFilteringService
         foreach ($dswTypeFilters as $dswTypeFilter => $value) {
             $dswTypeId = str_replace('dsw_type_', '', $dswTypeFilter);
 
-            if (!is_numeric($dswTypeId)) {
+            if (! is_numeric($dswTypeId)) {
                 continue;
             }
 
@@ -49,13 +49,11 @@ class HomeFilteringService
             $typesToExclude[] = $dswTypeId;
         }
 
-        if ($typesToInclude) {
+        if ($typesToInclude && $typesToExclude) {
             $activitiesQuery->whereHas('dswAnalysis', function (Builder $query) use ($typesToInclude) {
                 $query->whereIn('dsw_type_id', $typesToInclude);
             });
-        }
 
-        if ($typesToExclude) {
             $activitiesQuery->whereDoesntHave('dswAnalysis', function (Builder $query) use ($typesToExclude) {
                 $query->whereIn('dsw_type_id', $typesToExclude);
             });
@@ -79,10 +77,13 @@ class HomeFilteringService
             $filters['interval_activities'] ?? false,
             ! ($filters['non_interval_activities'] ?? false),
         ]);
+        sort($valuesToInclude);
 
-        $activitiesQuery->whereHas('dswAnalysis', function (Builder $query) use ($valuesToInclude) {
-            $query->whereIn('intervals', $valuesToInclude);
-        });
+        if ($valuesToInclude !== [false, true]) {
+            return $activitiesQuery->whereHas('dswAnalysis', function (Builder $query) use ($valuesToInclude) {
+                $query->whereIn('intervals', $valuesToInclude);
+            });
+        }
 
         return $activitiesQuery;
     }
@@ -93,20 +94,26 @@ class HomeFilteringService
             $filters['treadmill_activities'] ?? false,
             ! ($filters['non_treadmill_activities'] ?? false),
         ]);
+        sort($valuesToInclude);
 
-        $activitiesQuery->whereHas('dswAnalysis', function (Builder $query) use ($valuesToInclude) {
-            $query->whereIn('treadmill', $valuesToInclude);
-        });
+        if ($valuesToInclude !== [false, true]) {
+            $activitiesQuery->whereHas('dswAnalysis', function (Builder $query) use ($valuesToInclude) {
+                $query->whereIn('treadmill', $valuesToInclude);
+            });
+        }
 
         return $activitiesQuery;
     }
 
     private function applySort(Builder $activitiesQuery, ?string $sort, ?string $sortDirection): Builder
     {
-        $sort = $sort ?? 'started_at';
-        $sortDirection = $sortDirection ?? 'desc';
+        $sort ??= 'started_at';
+        $sortDirection ??= 'desc';
 
-        if (! in_array($sort, ['started_at', 'dsw_score'])) {
+        if (
+            ! in_array($sort, ['started_at', 'dsw_score', 'distance_meters'])
+            || ! in_array($sortDirection, ['asc', 'desc'])
+        ) {
             return $activitiesQuery->orderBy('started_at', 'desc');
         }
 
