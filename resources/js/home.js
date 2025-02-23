@@ -55,8 +55,21 @@ const extractFilterAndSortFromQueryParams = () => {
 }
 
 const addSortingListener = () => {
-    document.querySelectorAll('#activity_filters_modal button[id^="sort_"]').forEach((element) => {
-        element.addEventListener('click', () => {
+    const sortButtons = document.querySelectorAll('#activity_filters_modal button[id^="sort_"]');
+
+    sortButtons.forEach((element) => {
+        element.addEventListener('click', (e) => {
+            // Reset all sort buttons to their default state, except the one that was clicked.
+            sortButtons.forEach((element) => {
+                if (element !== e.target) {
+                    element.classList.remove('btn-primary');
+                    element.classList.add('btn-light');
+
+                    element.querySelector('.sort-asc').classList.add('d-none');
+                    element.querySelector('.sort-desc').classList.add('d-none');
+                }
+            });
+
             // First set to ASC, then to DESC, then to none.
             const sortAscArrow = element.querySelector('.sort-asc');
             const sortDescArrow = element.querySelector('.sort-desc');
