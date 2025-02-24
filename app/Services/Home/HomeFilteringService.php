@@ -50,12 +50,11 @@ class HomeFilteringService
         }
 
         if ($typesToInclude && $typesToExclude) {
-            $activitiesQuery->whereHas('dswAnalysis', function (Builder $query) use ($typesToInclude) {
-                $query->whereIn('dsw_type_id', $typesToInclude);
-            });
-
-            $activitiesQuery->whereDoesntHave('dswAnalysis', function (Builder $query) use ($typesToExclude) {
-                $query->whereIn('dsw_type_id', $typesToExclude);
+            $activitiesQuery->where(function (Builder $query) use ($typesToInclude, $typesToExclude) {
+                $query->whereHas('dswAnalysis', function (Builder $query) use ($typesToInclude, $typesToExclude) {
+                    $query->whereIn('dsw_type_id', $typesToInclude)
+                        ->whereNotIn('dsw_type_id', $typesToExclude);
+                })->orWhereDoesntHave('dswAnalysis');
             });
         }
 
@@ -80,8 +79,10 @@ class HomeFilteringService
         sort($valuesToInclude);
 
         if ($valuesToInclude !== [false, true]) {
-            return $activitiesQuery->whereHas('dswAnalysis', function (Builder $query) use ($valuesToInclude) {
-                $query->whereIn('intervals', $valuesToInclude);
+            return $activitiesQuery->where(function (Builder $query) use ($valuesToInclude) {
+                $query->whereHas('dswAnalysis', function (Builder $query) use ($valuesToInclude) {
+                    $query->whereIn('intervals', $valuesToInclude);
+                })->orWhereDoesntHave('dswAnalysis');
             });
         }
 
@@ -97,8 +98,10 @@ class HomeFilteringService
         sort($valuesToInclude);
 
         if ($valuesToInclude !== [false, true]) {
-            $activitiesQuery->whereHas('dswAnalysis', function (Builder $query) use ($valuesToInclude) {
-                $query->whereIn('treadmill', $valuesToInclude);
+            return $activitiesQuery->where(function (Builder $query) use ($valuesToInclude) {
+                $query->whereHas('dswAnalysis', function (Builder $query) use ($valuesToInclude) {
+                    $query->whereIn('treadmill', $valuesToInclude);
+                })->orWhereDoesntHave('dswAnalysis');
             });
         }
 
