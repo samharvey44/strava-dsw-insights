@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Gear\GearController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Strava\Auth\StravaAuthController;
 use App\Http\Controllers\Strava\Webhooks\StravaWebhooksController;
@@ -19,6 +20,15 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('/home')->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
+    });
+
+    Route::prefix('/gear')->group(function () {
+        Route::get('/', [GearController::class, 'index'])->name('gear');
+
+        Route::prefix('/create')->name('gear.')->group(function () {
+            Route::get('/', [GearController::class, 'create'])->name('create');
+            Route::post('/', [GearController::class, 'store'])->name('store');
+        });
     });
 });
 
