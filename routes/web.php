@@ -31,9 +31,15 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::prefix('/{gear}')->name('gear.')->group(function () {
-            Route::get('/', [GearController::class, 'edit'])->name('edit');
-            Route::patch('/', [GearController::class, 'update'])->name('update');
-            Route::delete('/', [GearController::class, 'destroy'])->name('destroy');
+            Route::get('/', [GearController::class, 'edit'])
+                ->name('edit')
+                ->middleware('can:update,gear');
+            Route::patch('/', [GearController::class, 'update'])
+                ->name('update')
+                ->middleware('can:update,gear');
+            Route::delete('/', [GearController::class, 'destroy'])
+                ->name('destroy')
+                ->middleware('can:destroy,gear');
         });
     });
 });

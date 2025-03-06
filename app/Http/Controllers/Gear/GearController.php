@@ -31,6 +31,7 @@ class GearController extends Controller
     public function store(StoreGearRequest $request): RedirectResponse
     {
         app(GearService::class)->store(
+            auth()->id(),
             $request->input('name'),
             $request->input('description'),
             $request->date('first_used'),
@@ -60,10 +61,11 @@ class GearController extends Controller
         return redirect()->route('gear')->with('success', 'Gear updated successfully!');
     }
 
-    public function destroy(Gear $gear): RedirectResponse
+    public function destroy(Request $request, Gear $gear): RedirectResponse
     {
         app(GearService::class)->destroy($gear);
 
-        return redirect()->route('gear')->with('success', 'Gear deleted successfully!');
+        return redirect()->route('gear', ['page' => $request->get('redirect_page') ?? 1])
+            ->with('success', 'Gear deleted successfully!');
     }
 }

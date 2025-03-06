@@ -10,11 +10,12 @@ use Illuminate\Http\UploadedFile;
 class GearService
 {
     public function store(
+        string $userId,
         string $name,
         ?string $description,
         ?DateTime $firstUsed,
         ?DateTime $decommissioned,
-        ?UploadedFile $image
+        ?UploadedFile $image,
     ): void {
         $imagePath = is_null($image)
             ? null
@@ -24,7 +25,7 @@ class GearService
             );
 
         Gear::create([
-            'user_id' => auth()->id(),
+            'user_id' => $userId,
             'name' => $name,
             'description' => $description,
             'first_used' => $firstUsed,
@@ -41,6 +42,10 @@ class GearService
         ?DateTime $decommissioned,
         ?UploadedFile $image
     ): void {
+        if (! is_null($image) && ! is_null($gear->image_path)) {
+            app(FileStorageService::class)->deletePubliclyStoredFile($gear->image_path);
+        }
+
         $imagePath = is_null($image)
             ? $gear->image_path
             : app(FileStorageService::class)->storePubliclyWithRandomFilename(

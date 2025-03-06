@@ -28,7 +28,7 @@ Breadcrumbs::for('strava.auth.successful', function (BreadcrumbTrail $trail) {
     $trail->push('Successful Strava Authorisation', route('strava.auth.successful'));
 });
 
-Breadcrumbs::for('strava.auth.failed', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('strava.auth.unsuccessful', function (BreadcrumbTrail $trail) {
     $trail->parent('home');
     $trail->push('Unsuccessful Strava Authorisation', route('strava.auth.unsuccessful'));
 });

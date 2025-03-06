@@ -10,28 +10,30 @@ class FileStorageService
 {
     public function storePubliclyWithRandomFilename(string $path, UploadedFile $file): string
     {
-        $filename = $this->generateRandomFilename($path, 'public');
+        $fileExtension = $file->getClientOriginalExtension();
 
-        $storedPath = Storage::disk('public')->putFileAs($path, $file, "{$filename}.{$file->extension()}");
+        $filename = $this->generateRandomFilename($path, $fileExtension, 'public');
+
+        $storedPath = Storage::disk('public')->putFileAs($path, $file, $filename);
 
         return "storage/{$storedPath}";
     }
 
-    public static function deletePubliclyStoredFile(string $path): void
+    public function deletePubliclyStoredFile(string $path): void
     {
-        $pathWithStorageRemoved = ltrim($path, 'storage/');
+        $pathWithStorageRemoved = explode('storage/', $path)[1] ?? $path;
 
         Storage::disk('public')->delete($pathWithStorageRemoved);
     }
 
-    private function generateRandomFilename(string $path, string $disk): string
+    private function generateRandomFilename(string $path, string $extension, string $disk): string
     {
         $filename = Str::random(50);
 
-        if (Storage::disk($disk)->exists("{$path}/{$filename}")) {
-            return $this->generateRandomFilename($path, $disk);
+        if (Storage::disk($disk)->exists("{$path}/{$filename}.{$extension}")) {
+            return $this->generateRandomFilename($path, $extension, $disk);
         }
 
-        return $filename;
+        return "{$filename}.{$extension}";
     }
 }
