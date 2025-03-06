@@ -1,4 +1,4 @@
-<x-app>
+<x-app page-title="Login">
     <div class="d-flex justify-content-center pt-5">
         <div style="max-width: 600px">
             <div class="card">

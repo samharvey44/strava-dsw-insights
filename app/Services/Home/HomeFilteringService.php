@@ -49,7 +49,7 @@ class HomeFilteringService
             $typesToExclude[] = $dswTypeId;
         }
 
-        if ($typesToInclude && $typesToExclude) {
+        if ($typesToInclude || $typesToExclude) {
             $activitiesQuery->where(function (Builder $query) use ($typesToInclude, $typesToExclude) {
                 $query->whereHas('dswAnalysis', function (Builder $query) use ($typesToInclude, $typesToExclude) {
                     $query->whereIn('dsw_type_id', $typesToInclude)
