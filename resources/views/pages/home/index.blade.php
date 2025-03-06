@@ -152,14 +152,14 @@
                     @empty
                         <div class="alert alert-info text-center" role="alert">
                             <span class="fs-6 fw-bolder">No activities found</span><br />
-                            @if($filtersApplied)
-                                No activities matched the filters you applied.
-                            @else
-                                <small>
+                            <small>
+                                @if($filtersApplied)
+                                    No activities matched the filters you applied.
+                                @else
                                     If you've only just connected your account, we might still be getting your data from Strava.<br />
                                     Check back in a few minutes.
-                                </small>
-                            @endif
+                                @endif
+                            </small>
                         </div>
                     @endforelse
                 @endif

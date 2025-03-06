@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Gear;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Carbon;
 
 class GearFactory extends Factory
 {

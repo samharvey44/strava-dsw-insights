@@ -20,6 +20,8 @@ return new class extends Migration
             $table->date('decommissioned')->nullable();
 
             $table->timestamps();
+
+            $table->index('created_at');
         });
     }
 

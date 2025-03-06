@@ -29,6 +29,12 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [GearController::class, 'create'])->name('create');
             Route::post('/', [GearController::class, 'store'])->name('store');
         });
+
+        Route::prefix('/{gear}')->name('gear.')->group(function () {
+            Route::get('/', [GearController::class, 'edit'])->name('edit');
+            Route::patch('/', [GearController::class, 'update'])->name('update');
+            Route::delete('/', [GearController::class, 'destroy'])->name('destroy');
+        });
     });
 });
 
