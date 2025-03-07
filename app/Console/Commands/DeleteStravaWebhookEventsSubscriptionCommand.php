@@ -10,7 +10,7 @@ class DeleteStravaWebhookEventsSubscriptionCommand extends Command
 {
     protected $signature = 'strava:delete-webhook-events-subscription';
 
-    protected $description = 'Subscribe to Strava webhook events.';
+    protected $description = 'Delete the subscription to Strava webhook events.';
 
     public function handle(): void
     {
