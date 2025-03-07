@@ -17,6 +17,9 @@ class GearController extends Controller
     {
         $gear = Gear::query()
             ->where('user_id', auth()->id())
+            ->with([
+                'reminders' => fn ($query) => $query->orderByDesc('created_at'),
+            ])
             ->orderByDesc('created_at')
             ->paginate(20);
 

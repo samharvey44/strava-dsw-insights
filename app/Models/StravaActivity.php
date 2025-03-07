@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class StravaActivity extends Model
@@ -40,6 +41,12 @@ class StravaActivity extends Model
     public function dswAnalysis(): HasOne
     {
         return $this->hasOne(StravaActivityDswAnalysis::class, 'strava_activity_id');
+    }
+
+    public function gears(): BelongsToMany
+    {
+        return $this->belongsToMany(Gear::class, 'strava_activity_gear', 'strava_activity_id', 'gear_id')
+            ->withTimestamps();
     }
 
     public function scopeByUser(Builder $query, User $user): void
