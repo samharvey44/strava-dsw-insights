@@ -106,7 +106,7 @@
                     <label class="form-label" for="image">Image</label>
                     <input
                         type="file"
-                        class="form-control"
+                        class="form-control @error('image') is-invalid @enderror"
                         id="image"
                         name="image"
                         @change="imageFileUrl = URL.createObjectURL($event.target.files[0])"
