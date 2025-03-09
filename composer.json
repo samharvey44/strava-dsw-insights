@@ -12,7 +12,8 @@
         "php": "^8.4",
         "laravel/framework": "^12.1",
         "diglactic/laravel-breadcrumbs": "^10.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "ext-intl": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.4",

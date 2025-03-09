@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Events;
 
-use App\Events\StravaActivityReadyForDswAnalysisEvent;
+use App\Events\StravaActivityWebhookProcessedEvent;
 use App\Listeners\PerformStravaActivityDswAnalysisListener;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Queue;
 use Tests\TestCase;
 
-class StravaActivityReadyForDswAnalysisEventTest extends TestCase
+class StravaActivityWebhookProcessedEventTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -19,7 +19,7 @@ class StravaActivityReadyForDswAnalysisEventTest extends TestCase
             CallQueuedListener::class,
         ]);
 
-        StravaActivityReadyForDswAnalysisEvent::dispatch(123, 456);
+        StravaActivityWebhookProcessedEvent::dispatch(123, 456);
 
         Queue::assertPushed(CallQueuedListener::class, function (CallQueuedListener $job) {
             return $job->class === PerformStravaActivityDswAnalysisListener::class;

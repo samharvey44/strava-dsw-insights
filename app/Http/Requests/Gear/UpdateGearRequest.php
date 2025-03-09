@@ -1,16 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Gear;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreGearRequest extends FormRequest
+class UpdateGearRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [
@@ -20,6 +15,11 @@ class StoreGearRequest extends FormRequest
             'decommissioned' => ['nullable', 'date'],
             'image' => ['nullable', 'image:allow_svg', 'max:5000'],
         ];
+    }
+
+    public function authorize(): bool
+    {
+        return $this->user()->can('update', $this->route('gear'));
     }
 
     public function messages(): array

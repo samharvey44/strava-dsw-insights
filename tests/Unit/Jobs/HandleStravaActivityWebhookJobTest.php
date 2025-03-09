@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Jobs;
 
-use App\Events\StravaActivityReadyForDswAnalysisEvent;
+use App\Events\StravaActivityWebhookProcessedEvent;
 use App\Jobs\HandleStravaActivityWebhookJob;
 use App\Models\StravaConnection;
 use App\Models\User;
@@ -41,7 +41,7 @@ class HandleStravaActivityWebhookJobTest extends TestCase
             'stravaActivityId' => 456,
         ])->handle();
 
-        Event::assertDispatched(StravaActivityReadyForDswAnalysisEvent::class, function (StravaActivityReadyForDswAnalysisEvent $event) use ($stravaConnection) {
+        Event::assertDispatched(StravaActivityWebhookProcessedEvent::class, function (StravaActivityWebhookProcessedEvent $event) use ($stravaConnection) {
             return $event->stravaAthleteId === $stravaConnection->athlete_id
                 && $event->stravaActivityId === 456;
         });
@@ -71,7 +71,7 @@ class HandleStravaActivityWebhookJobTest extends TestCase
             'stravaActivityId' => 456,
         ])->handle();
 
-        Event::assertDispatched(StravaActivityReadyForDswAnalysisEvent::class, function (StravaActivityReadyForDswAnalysisEvent $event) use ($stravaConnection) {
+        Event::assertDispatched(StravaActivityWebhookProcessedEvent::class, function (StravaActivityWebhookProcessedEvent $event) use ($stravaConnection) {
             return $event->stravaAthleteId === $stravaConnection->athlete_id
                 && $event->stravaActivityId === 456;
         });
@@ -101,6 +101,6 @@ class HandleStravaActivityWebhookJobTest extends TestCase
             'stravaActivityId' => 456,
         ])->handle();
 
-        Event::assertNotDispatched(StravaActivityReadyForDswAnalysisEvent::class);
+        Event::assertNotDispatched(StravaActivityWebhookProcessedEvent::class);
     }
 }
