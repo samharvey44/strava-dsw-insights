@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Listeners;
 
-use App\Events\StravaActivityReadyForDswAnalysisEvent;
+use App\Events\StravaActivityWebhookProcessedEvent;
 use App\Listeners\PerformStravaActivityDswAnalysisListener;
 use App\Models\StravaActivity;
 use App\Models\StravaConnection;
@@ -35,7 +35,7 @@ class PerformStravaActivityDswAnalysisListenerTest extends TestCase
         );
         app()->instance(StravaActivityDswAnalysisService::class, $mockedDswAnalysisService);
 
-        $event = app(StravaActivityReadyForDswAnalysisEvent::class, [
+        $event = app(StravaActivityWebhookProcessedEvent::class, [
             'stravaAthleteId' => 123,
             'stravaActivityId' => 456,
         ]);
@@ -60,7 +60,7 @@ class PerformStravaActivityDswAnalysisListenerTest extends TestCase
         $mockedDswAnalysisService->shouldNotReceive('performAnalysis');
         app()->instance(StravaActivityDswAnalysisService::class, $mockedDswAnalysisService);
 
-        $event = app(StravaActivityReadyForDswAnalysisEvent::class, [
+        $event = app(StravaActivityWebhookProcessedEvent::class, [
             'stravaAthleteId' => 456,
             'stravaActivityId' => 456,
         ]);
@@ -85,7 +85,7 @@ class PerformStravaActivityDswAnalysisListenerTest extends TestCase
         $mockedDswAnalysisService->shouldNotReceive('performAnalysis');
         app()->instance(StravaActivityDswAnalysisService::class, $mockedDswAnalysisService);
 
-        $event = app(StravaActivityReadyForDswAnalysisEvent::class, [
+        $event = app(StravaActivityWebhookProcessedEvent::class, [
             'stravaAthleteId' => 123,
             'stravaActivityId' => 123,
         ]);
