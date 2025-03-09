@@ -52,7 +52,9 @@ class GearRemindersService
             )->where(function ($query) {
                 $query->whereNull('decommissioned')
                     ->orWhereDate('decommissioned', '>', now()->toDateString());
-            })->whereHas('reminders')
+            })
+            ->where('auto_attach_to_activities', true)
+            ->whereHas('reminders')
             ->get();
 
         DB::transaction(function () use ($stravaActivity, $nonDecommissionedGearWithReminders) {
