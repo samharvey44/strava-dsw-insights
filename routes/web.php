@@ -5,12 +5,10 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Gear\GearController;
 use App\Http\Controllers\Gear\Reminders\GearReminderController;
 use App\Http\Controllers\Home\HomeController;
+use App\Http\Controllers\Strava\Activities\StravaActivityController;
 use App\Http\Controllers\Strava\Auth\StravaAuthController;
 use App\Http\Controllers\Strava\Webhooks\StravaWebhooksController;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/test', fn () => app(\App\Services\Gear\Reminders\GearRemindersService::class)
-->attachGearAndTriggerReminders(\App\Models\StravaActivity::latest()->first()));
 
 Route::middleware('guest')->group(function () {
     Route::prefix('/login')->group(function () {
@@ -50,6 +48,22 @@ Route::middleware('auth')->group(function () {
                         ->name('update');
                     Route::delete('/', [GearReminderController::class, 'destroy'])
                         ->name('destroy');
+                });
+            });
+        });
+    });
+
+    Route::prefix('/activities')->name('activities.')->group(function () {
+        Route::prefix('/{stravaActivity}')->group(function () {
+            Route::prefix('/gear')->name('gear.')->group(function () {
+                Route::get('/modal-contents', [StravaActivityController::class, 'gearModalContents'])
+                    ->name('modal-contents');
+
+                Route::prefix('/{gear}')->group(function () {
+                    Route::post('/', [StravaActivityController::class, 'attachGear'])
+                        ->name('attach');
+                    Route::delete('/', [StravaActivityController::class, 'detachGear'])
+                        ->name('detach');
                 });
             });
         });

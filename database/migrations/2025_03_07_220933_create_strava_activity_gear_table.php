@@ -14,6 +14,8 @@ return new class extends Migration
             $table->foreignId('strava_activity_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('gear_id')->constrained()->cascadeOnDelete();
 
+            $table->unique(['strava_activity_id', 'gear_id']);
+
             $table->timestamps();
         });
     }

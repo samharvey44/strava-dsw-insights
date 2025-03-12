@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Home;
 use App\Http\Controllers\Controller;
 use App\Models\StravaActivity;
 use App\Services\DswTypes\DswTypesService;
+use App\Services\Gear\GearService;
 use App\Services\Home\HomeFilteringService;
 use App\Services\Strava\DSWAnalysis\StravaActivityDswAnalysisScoringService;
 use Illuminate\Contracts\View\View;
@@ -15,7 +16,7 @@ class HomeController extends Controller
     public function index(Request $request): View
     {
         $activities = app(HomeFilteringService::class)->applyFiltersAndSort(
-            StravaActivity::byUser(auth()->user())->with('dswAnalysis.dswType.typeGroup'),
+            StravaActivity::byUser(auth()->user())->with('dswAnalysis.dswType.typeGroup', 'gears'),
             $request->array('filters'),
             $request->get('sort'),
             $request->get('sort_direction')
@@ -27,13 +28,15 @@ class HomeController extends Controller
             )
             : collect();
 
+        $gears = app(GearService::class)->getUserGear(auth()->id());
+
         $dswTypes = app(DswTypesService::class)->getAllTypes();
 
         $filtersApplied = ! empty($request->array('filters'));
 
         return view(
             'pages.home.index',
-            compact('activities', 'scoreBands', 'dswTypes', 'filtersApplied')
+            compact('activities', 'scoreBands', 'dswTypes', 'gears', 'filtersApplied')
         );
     }
 }

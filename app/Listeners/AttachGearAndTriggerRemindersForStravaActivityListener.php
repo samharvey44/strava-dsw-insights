@@ -5,7 +5,6 @@ namespace App\Listeners;
 use App\Events\StravaActivityWebhookProcessedEvent;
 use App\Models\StravaActivity;
 use App\Services\Gear\Reminders\GearRemindersService;
-use App\Services\Strava\DSWAnalysis\StravaActivityDswAnalysisService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
 
