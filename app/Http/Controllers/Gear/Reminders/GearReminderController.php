@@ -23,7 +23,7 @@ class GearReminderController extends Controller
         ]);
     }
 
-    public function store(StoreGearReminderRequest $request, Gear $gear)
+    public function store(StoreGearReminderRequest $request, Gear $gear): void
     {
         app(GearRemindersService::class)->store(
             $gear->id,
@@ -35,7 +35,7 @@ class GearReminderController extends Controller
         session()->flash('success', 'Reminder created successfully!');
     }
 
-    public function update(UpdateGearReminderRequest $request, Gear $gear, GearReminder $gearReminder)
+    public function update(UpdateGearReminderRequest $request, Gear $gear, GearReminder $gearReminder): void
     {
         app(GearRemindersService::class)->update(
             $gearReminder,
@@ -47,7 +47,7 @@ class GearReminderController extends Controller
         session()->flash('success', 'Reminder updated successfully!');
     }
 
-    public function destroy(DestroyGearReminderRequest $request, Gear $gear, GearReminder $gearReminder)
+    public function destroy(DestroyGearReminderRequest $request, Gear $gear, GearReminder $gearReminder): void
     {
         app(GearRemindersService::class)->destroy($gearReminder);
 

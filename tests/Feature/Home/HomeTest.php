@@ -4,10 +4,12 @@ namespace Tests\Feature\Home;
 
 use App\Models\DswType;
 use App\Models\DswTypeGroup;
+use App\Models\Gear;
 use App\Models\StravaActivity;
 use App\Models\StravaConnection;
 use App\Models\User;
 use App\Services\DswTypes\DswTypesService;
+use App\Services\Gear\GearService;
 use App\Services\Home\HomeFilteringService;
 use App\Services\Strava\DSWAnalysis\StravaActivityDswAnalysisScoringService;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,6 +29,10 @@ class HomeTest extends TestCase
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
         ]);
 
+        $gear = Gear::factory()->count(3)->create([
+            'user_id' => $user->id,
+        ]);
+
         $activityQuery = StravaActivity::query();
 
         $mockedHomeFilteringService = Mockery::mock(HomeFilteringService::class);
@@ -44,6 +50,10 @@ class HomeTest extends TestCase
         $mockedScoringService->shouldNotReceive('getScoreBandsByType');
         app()->instance(StravaActivityDswAnalysisScoringService::class, $mockedScoringService);
 
+        $mockedGearService = Mockery::mock(GearService::class);
+        $mockedGearService->shouldReceive('getUserGear')->with($user->id)->andReturn($gear);
+        app()->instance(GearService::class, $mockedGearService);
+
         $mockedDswTypesService = Mockery::mock(DswTypesService::class);
         $mockedDswTypesService->shouldReceive('getAllTypes')->andReturn($dswTypes);
         app()->instance(DswTypesService::class, $mockedDswTypesService);
@@ -57,6 +67,7 @@ class HomeTest extends TestCase
         $response->assertViewHas([
             'activities' => $activityQuery->paginate(20),
             'scoreBands' => collect(),
+            'gears' => $gear,
             'dswTypes' => $dswTypes,
             'filtersApplied' => false,
         ]);
@@ -68,6 +79,10 @@ class HomeTest extends TestCase
         $stravaConnection = StravaConnection::factory()->create([
             'user_id' => $user->id,
             'active' => true,
+        ]);
+
+        $gear = Gear::factory()->count(3)->create([
+            'user_id' => $user->id,
         ]);
 
         $dswTypes = DswType::factory()->count(3)->create([
@@ -93,6 +108,10 @@ class HomeTest extends TestCase
             ->andReturn(collect());
         app()->instance(StravaActivityDswAnalysisScoringService::class, $mockedScoringService);
 
+        $mockedGearService = Mockery::mock(GearService::class);
+        $mockedGearService->shouldReceive('getUserGear')->with($user->id)->andReturn($gear);
+        app()->instance(GearService::class, $mockedGearService);
+
         $mockedDswTypesService = Mockery::mock(DswTypesService::class);
         $mockedDswTypesService->shouldReceive('getAllTypes')->andReturn($dswTypes);
         app()->instance(DswTypesService::class, $mockedDswTypesService);
@@ -106,6 +125,7 @@ class HomeTest extends TestCase
         $response->assertViewHas([
             'activities' => $activityQuery->paginate(20),
             'scoreBands' => collect(),
+            'gears' => $gear,
             'dswTypes' => $dswTypes,
             'filtersApplied' => false,
         ]);
@@ -121,6 +141,10 @@ class HomeTest extends TestCase
 
         $dswTypes = DswType::factory()->count(3)->create([
             'dsw_type_group_id' => DswTypeGroup::factory()->create()->id,
+        ]);
+
+        $gear = Gear::factory()->count(3)->create([
+            'user_id' => $user->id,
         ]);
 
         $activityQuery = StravaActivity::query();
@@ -142,6 +166,10 @@ class HomeTest extends TestCase
             ->andReturn(collect());
         app()->instance(StravaActivityDswAnalysisScoringService::class, $mockedScoringService);
 
+        $mockedGearService = Mockery::mock(GearService::class);
+        $mockedGearService->shouldReceive('getUserGear')->with($user->id)->andReturn($gear);
+        app()->instance(GearService::class, $mockedGearService);
+
         $mockedDswTypesService = Mockery::mock(DswTypesService::class);
         $mockedDswTypesService->shouldReceive('getAllTypes')->andReturn($dswTypes);
         app()->instance(DswTypesService::class, $mockedDswTypesService);
@@ -155,6 +183,7 @@ class HomeTest extends TestCase
         $response->assertViewHas([
             'activities' => $activityQuery->paginate(20),
             'scoreBands' => collect(),
+            'gears' => $gear,
             'dswTypes' => $dswTypes,
             'filtersApplied' => true,
         ]);

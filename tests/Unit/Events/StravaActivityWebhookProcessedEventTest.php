@@ -3,6 +3,7 @@
 namespace Tests\Unit\Events;
 
 use App\Events\StravaActivityWebhookProcessedEvent;
+use App\Listeners\AttachGearAndTriggerRemindersForStravaActivityListener;
 use App\Listeners\PerformStravaActivityDswAnalysisListener;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,6 +24,9 @@ class StravaActivityWebhookProcessedEventTest extends TestCase
 
         Queue::assertPushed(CallQueuedListener::class, function (CallQueuedListener $job) {
             return $job->class === PerformStravaActivityDswAnalysisListener::class;
+        });
+        Queue::assertPushed(CallQueuedListener::class, function (CallQueuedListener $job) {
+            return $job->class === AttachGearAndTriggerRemindersForStravaActivityListener::class;
         });
     }
 }
