@@ -28,7 +28,10 @@ window.axios.interceptors.response.use(
         return response;
     },
     (error) => {
-        buildTooltips();
+        // Ensure tooltips are rebuilt in case DOM has been updated
+        setTimeout(() => {
+            buildTooltips();
+        }, 1000);
 
         return Promise.reject(error);
     },
