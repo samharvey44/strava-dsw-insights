@@ -6,6 +6,7 @@ use App\Models\Gear;
 use App\Services\Files\FileStorageService;
 use DateTime;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 
 class GearService
 {
@@ -71,5 +72,10 @@ class GearService
         }
 
         app(FileStorageService::class)->deletePubliclyStoredFile($gear->image_path);
+    }
+
+    public function getUserGear(string $userId): Collection
+    {
+        return Gear::where('user_id', $userId)->get();
     }
 }

@@ -17,6 +17,7 @@ class GearFactory extends Factory
             'image_path' => $this->faker->filePath(),
             'first_used' => $this->faker->date(),
             'decommissioned' => $this->faker->date(),
+            'auto_attach_to_activities' => $this->faker->boolean(),
         ];
     }
 }

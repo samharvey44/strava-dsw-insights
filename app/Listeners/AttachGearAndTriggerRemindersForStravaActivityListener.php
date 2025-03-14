@@ -4,11 +4,11 @@ namespace App\Listeners;
 
 use App\Events\StravaActivityWebhookProcessedEvent;
 use App\Models\StravaActivity;
-use App\Services\Strava\DSWAnalysis\StravaActivityDswAnalysisService;
+use App\Services\Gear\Reminders\GearRemindersService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
 
-class PerformStravaActivityDswAnalysisListener implements ShouldQueue
+class AttachGearAndTriggerRemindersForStravaActivityListener implements ShouldQueue
 {
     public function handle(StravaActivityWebhookProcessedEvent $event): void
     {
@@ -21,6 +21,6 @@ class PerformStravaActivityDswAnalysisListener implements ShouldQueue
             return;
         }
 
-        app(StravaActivityDswAnalysisService::class)->performAnalysis($stravaActivity);
+        app(GearRemindersService::class)->attachGearAndTriggerReminders($stravaActivity);
     }
 }

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Gear;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreGearRequest;
-use App\Http\Requests\UpdateGearRequest;
+use App\Http\Requests\Gear\DestroyGearRequest;
+use App\Http\Requests\Gear\EditGearRequest;
+use App\Http\Requests\Gear\StoreGearRequest;
+use App\Http\Requests\Gear\UpdateGearRequest;
 use App\Models\Gear;
 use App\Services\Gear\GearService;
 use Illuminate\Contracts\View\View;
@@ -17,6 +19,9 @@ class GearController extends Controller
     {
         $gear = Gear::query()
             ->where('user_id', auth()->id())
+            ->with([
+                'reminders' => fn ($query) => $query->orderByDesc('created_at'),
+            ])
             ->orderByDesc('created_at')
             ->paginate(20);
 
@@ -42,7 +47,7 @@ class GearController extends Controller
         return redirect()->route('gear')->with('success', 'Gear created successfully!');
     }
 
-    public function edit(Gear $gear): View
+    public function edit(EditGearRequest $request, Gear $gear): View
     {
         return view('pages.gear.edit', compact('gear'));
     }
@@ -61,7 +66,7 @@ class GearController extends Controller
         return redirect()->route('gear')->with('success', 'Gear updated successfully!');
     }
 
-    public function destroy(Request $request, Gear $gear): RedirectResponse
+    public function destroy(DestroyGearRequest $request, Gear $gear): RedirectResponse
     {
         app(GearService::class)->destroy($gear);
 

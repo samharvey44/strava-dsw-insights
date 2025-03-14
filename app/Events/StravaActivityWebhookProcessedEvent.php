@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-class StravaActivityReadyForDswAnalysisEvent extends Event
+class StravaActivityWebhookProcessedEvent extends Event
 {
     public function __construct(
         public readonly int $stravaAthleteId,
