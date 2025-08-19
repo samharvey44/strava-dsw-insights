@@ -10,7 +10,7 @@
         "axios": "^1.8.1",
         "concurrently": "^9.1.2",
         "laravel-vite-plugin": "^1.2",
-        "vite": "^6.2",
+        "vite": "^7.1",
         "@mapbox/polyline": "^1.2.1"
     }
 }
