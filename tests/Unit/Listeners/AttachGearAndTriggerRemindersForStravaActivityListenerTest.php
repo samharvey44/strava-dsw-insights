@@ -3,17 +3,17 @@
 namespace Tests\Unit\Listeners;
 
 use App\Events\StravaActivityWebhookProcessedEvent;
-use App\Listeners\PerformStravaActivityDswAnalysisListener;
+use App\Listeners\AttachGearAndTriggerRemindersForStravaActivityListener;
 use App\Models\StravaActivity;
 use App\Models\StravaConnection;
 use App\Models\StravaRawActivity;
 use App\Models\User;
-use App\Services\Strava\DSWAnalysis\StravaActivityDswAnalysisService;
+use App\Services\Gear\Reminders\GearRemindersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
 
-class PerformStravaActivityDswAnalysisListenerTest extends TestCase
+class AttachGearAndTriggerRemindersForStravaActivityListenerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -29,18 +29,18 @@ class PerformStravaActivityDswAnalysisListenerTest extends TestCase
             ])->id,
         ]);
 
-        $mockedDswAnalysisService = Mockery::mock(StravaActivityDswAnalysisService::class);
-        $mockedDswAnalysisService->shouldReceive('performAnalysis')->once()->with(
+        $mockedGearRemindersService = Mockery::mock(GearRemindersService::class);
+        $mockedGearRemindersService->shouldReceive('attachGearAndTriggerReminders')->once()->with(
             Mockery::on(fn ($stravaActivityArg) => $stravaActivityArg->is($stravaActivity))
         );
-        app()->instance(StravaActivityDswAnalysisService::class, $mockedDswAnalysisService);
+        app()->instance(GearRemindersService::class, $mockedGearRemindersService);
 
         $event = app(StravaActivityWebhookProcessedEvent::class, [
             'stravaAthleteId' => 123,
             'stravaActivityId' => 456,
         ]);
 
-        $listener = app(PerformStravaActivityDswAnalysisListener::class);
+        $listener = app(AttachGearAndTriggerRemindersForStravaActivityListener::class);
         $listener->handle($event);
     }
 
@@ -56,16 +56,16 @@ class PerformStravaActivityDswAnalysisListenerTest extends TestCase
             ])->id,
         ]);
 
-        $mockedDswAnalysisService = Mockery::mock(StravaActivityDswAnalysisService::class);
-        $mockedDswAnalysisService->shouldNotReceive('performAnalysis');
-        app()->instance(StravaActivityDswAnalysisService::class, $mockedDswAnalysisService);
+        $mockedGearRemindersService = Mockery::mock(GearRemindersService::class);
+        $mockedGearRemindersService->shouldNotReceive('attachGearAndTriggerReminders');
+        app()->instance(GearRemindersService::class, $mockedGearRemindersService);
 
         $event = app(StravaActivityWebhookProcessedEvent::class, [
             'stravaAthleteId' => 456,
             'stravaActivityId' => 456,
         ]);
 
-        $listener = app(PerformStravaActivityDswAnalysisListener::class);
+        $listener = app(AttachGearAndTriggerRemindersForStravaActivityListener::class);
         $listener->handle($event);
     }
 
@@ -81,16 +81,16 @@ class PerformStravaActivityDswAnalysisListenerTest extends TestCase
             ])->id,
         ]);
 
-        $mockedDswAnalysisService = Mockery::mock(StravaActivityDswAnalysisService::class);
-        $mockedDswAnalysisService->shouldNotReceive('performAnalysis');
-        app()->instance(StravaActivityDswAnalysisService::class, $mockedDswAnalysisService);
+        $mockedGearRemindersService = Mockery::mock(GearRemindersService::class);
+        $mockedGearRemindersService->shouldNotReceive('attachGearAndTriggerReminders');
+        app()->instance(GearRemindersService::class, $mockedGearRemindersService);
 
         $event = app(StravaActivityWebhookProcessedEvent::class, [
             'stravaAthleteId' => 123,
             'stravaActivityId' => 123,
         ]);
 
-        $listener = app(PerformStravaActivityDswAnalysisListener::class);
+        $listener = app(AttachGearAndTriggerRemindersForStravaActivityListener::class);
         $listener->handle($event);
     }
 }

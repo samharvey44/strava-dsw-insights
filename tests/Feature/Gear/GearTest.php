@@ -33,6 +33,9 @@ class GearTest extends TestCase
             'gear',
             Gear::query()
                 ->where('user_id', $user->id)
+                ->with([
+                    'reminders' => fn ($query) => $query->orderByDesc('created_at'),
+                ])
                 ->orderByDesc('created_at')
                 ->paginate(20)
         );

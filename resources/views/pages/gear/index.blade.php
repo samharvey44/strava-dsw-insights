@@ -75,6 +75,15 @@
                                                            value="{{ min(1, count($gear) > 1 ? request()->query('page', 1) : (request()->query('page', 1) - 1)) }}"
                                                     >
                                                 </form>
+
+                                                <button class="btn btn-warning btn-sm ms-2"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#gear_reminder_modal_{{ $gearItem->id }}"
+                                                        type="button"
+                                                >
+                                                    <i class="bi bi-alarm"></i>
+                                                    Reminders
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -114,5 +123,11 @@
                 </div>
             @endif
         </div>
+
+        @foreach($gear as $gearItem)
+            <div class="modal fade" id="gear_reminder_modal_{{ $gearItem->id }}" tabindex="-1">
+                @include('pages.gear.partials.gear_reminder_modal_contents', compact('gearItem'))
+            </div>
+        @endforeach
     </div>
 </x-app>

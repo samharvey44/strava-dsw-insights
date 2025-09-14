@@ -130,8 +130,17 @@
                                                         </span>
                                                         @break
                                                 @endswitch
-                                                <br />
+                                                <br/>
                                             @endif
+
+                                            <span role="button"
+                                                  class="badge bg-light text-dark mt-3"
+                                                  data-bs-toggle="modal"
+                                                  data-bs-target="#activity_gear_modal_{{ $activity->id }}"
+                                            >
+                                                <i class="bi bi-backpack3"></i>
+                                                Gear (<span id="gear_modal_popup_gear_count_{{ $activity->id }}">{{ $activity->gears->count() }}</span>)
+                                            </span>
                                         </p>
                                     </div>
 
@@ -148,6 +157,10 @@
                                     @endif
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="modal fade" tabindex="-1" id="activity_gear_modal_{{ $activity->id }}">
+                            @include('pages.home.partials.activity_gear_modal_contents', compact('activity', 'gears'))
                         </div>
                     @empty
                         <div class="alert alert-info text-center" role="alert">
